@@ -3,8 +3,26 @@ import React from "react";
 import { Input, Grid, Button, Field, Box, Text, Flex } from "@chakra-ui/react";
 import Link from "next/link";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const LoginForm = () => {
+  // Initial form values for input fields
+  const initialValues = {
+    email: "",
+    password: "",
+  };
+
+  // Form validation schema using Yup
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+  });
+  // Formik form state management and submission handling
   return (
     <Box>
       <form onSubmit={() => {}} noValidate>
@@ -30,7 +48,9 @@ const LoginForm = () => {
             color="white"
             fontWeight="bold"
             type="submit"
-            loadingText="Signing in..."
+            disabled={formik.isSubmitting}
+            loading={formik.isSubmitting}
+            loadingText="logging in..."
           >
             Sign in
           </Button>
