@@ -1,3 +1,6 @@
+import React from "react";
+import LoginPage from "./auth/login/page";
+
 export default function Page() {
-  return <h1>Hello, Next.js!</h1>;
+  return <LoginPage />;
 }

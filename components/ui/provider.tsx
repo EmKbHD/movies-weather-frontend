@@ -1,12 +1,17 @@
 "use client";
 
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import { ApolloProvider } from "@apollo/client";
+import { ChakraProvider } from "@chakra-ui/react";
+import { client } from "@/lib/apollo";
+import { system } from "../theme/theme";
 import { ColorModeProvider, type ColorModeProviderProps } from "./color-mode";
 
 export function Provider(props: ColorModeProviderProps) {
   return (
-    <ChakraProvider value={defaultSystem}>
-      <ColorModeProvider {...props} />
-    </ChakraProvider>
+    <ApolloProvider client={client}>
+      <ChakraProvider value={system}>
+        <ColorModeProvider {...props} />
+      </ChakraProvider>
+    </ApolloProvider>
   );
 }
