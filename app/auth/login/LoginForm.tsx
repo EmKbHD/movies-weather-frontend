@@ -17,13 +17,10 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
-import { useMutation, ApolloError, useApolloClient } from "@apollo/client";
-import { LOGIN_USER } from "@/lib/graphql";
+import { signin } from "next-auth/react";
 
 const LoginForm = () => {
-  const [logIn, { loading }] = useMutation(LOGIN_USER);
   const router = useRouter();
-  const client = useApolloClient();
 
   const initialValues = {
     email: "",
@@ -44,12 +41,13 @@ const LoginForm = () => {
     validationSchema,
     onSubmit: async (values, { setFieldError }) => {
       try {
-        const { data } = await logIn({ variables: { input: values } });
+        const res = await signin("credentials", {
+          redirect: false,
+          email: values.email,
+          password: values.password,
+        });
 
-        const user = data?.logIn;
-        if (user) {
-          await client.resetStore();
-          setTimeout(() => router.replace("/pages/homePage"), 2500);
+        if (res?.error) {
         }
       } catch (error) {
         const errMessage =

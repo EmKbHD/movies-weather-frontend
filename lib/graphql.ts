@@ -12,21 +12,6 @@ export const GET_USER = gql`
   }
 `;
 
-// LOGIN GraphQL MUTATION
-
-export const LOGIN_USER = gql`
-  mutation logIn($input: LogInInput!) {
-    logIn(input: $input) {
-      user {
-        firstName
-        lastName
-        email
-      }
-      token
-    }
-  }
-`;
-
 // SIGNUP MUTATION
 
 export const SIGNUP_USER = gql`
