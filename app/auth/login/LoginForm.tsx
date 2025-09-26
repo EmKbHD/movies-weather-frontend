@@ -16,11 +16,25 @@ import Link from "next/link";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-// import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 const LoginForm = () => {
-  // const router = useRouter();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // If Auth.js ever redirects with ?error=..., show it in a toast
+  React.useEffect(() => {
+    const err = searchParams.get("error");
+    if (err) {
+      toaster.create({
+        title: "Login failed",
+        description: decodeURIComponent(err),
+        type: "error",
+        duration: 5000,
+      });
+    }
+  }, [searchParams]);
 
   const initialValues = {
     email: "",
@@ -41,10 +55,13 @@ const LoginForm = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
+        // Ask Auth.js to sign in WITHOUT redirecting the browser
         const res = await signIn("credentials", {
           redirect: false,
           email: values.email,
           password: values.password,
+          // If you want to control where to go after login:
+          callbackUrl: "/dashboard",
         });
         if (!res) {
           console.log("Login failed", res);
@@ -56,27 +73,39 @@ const LoginForm = () => {
           });
           return;
         }
-        if (res.ok && !res.error) {
-          console.log("✅Login successful", res);
-          return;
-        }
 
-        if (res?.error) {
+        if (res.error) {
+          // This string comes from our `authorize` → CredentialsSignin(message)
           toaster.create({
             title: "Login failed",
-            description: "Invalid email or password.",
+            description: res.error || "Invalid email or password.",
             type: "error",
             duration: 5000,
           });
           return;
         }
-        console.log("Login successful", res);
-      } catch (error) {
+
+        if (res.ok && !res.error) {
+          console.log("✅Login successful", res);
+          toaster.create({
+            title: "Welcome back!",
+            type: "success",
+            duration: 2500,
+          });
+
+          //res.url will be the callbackUrl we provided above
+          router.replace(res.url || "/dashboard");
+          return;
+        }
+      } catch (error: unknown) {
         toaster.create({
-          title: "errMessage",
+          title: error || "Please try again!",
           type: "error",
           duration: 5000,
         });
+      } finally {
+        // Optional: if you want to keep the button spinning until navigation, remove this.
+        formik.setSubmitting(false);
       }
     },
   });
@@ -152,9 +181,9 @@ const LoginForm = () => {
                 fontWeight="bold"
                 size="lg"
                 w="full"
-                // disabled={loading || formik.isSubmitting}
-                // loading={loading || formik.isSubmitting}
+                loading={formik.isSubmitting}
                 loadingText="Signing in..."
+                disabled={formik.isSubmitting}
               >
                 Sign In
               </Button>

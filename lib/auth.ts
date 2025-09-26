@@ -2,6 +2,7 @@ import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  session: { strategy: "jwt" },
   providers: [
     Credentials({
       credentials: { email: {}, password: {} },
@@ -55,17 +56,26 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
           console.log("GraphQL json:", JSON.stringify(results, null, 2));
 
-          const login = results?.data?.login ?? null;
+          const login = results?.data?.login;
 
           if (!login?.user || !login?.token) {
             throw new CredentialsSignin("Invalid email or password!");
           }
 
-          const { user, token } = login;
+          const { user, token } = login as {
+            user: {
+              id: string;
+              firstName: string;
+              lastName: string;
+              email: string;
+              city?: string;
+            };
+            token: string;
+          };
 
           // Return a shape compatible with our extended User type
           return {
-            id: user.id,
+            id: String(user.id),
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
@@ -111,5 +121,4 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       return session;
     },
   },
-  session: { strategy: "jwt" },
 });
