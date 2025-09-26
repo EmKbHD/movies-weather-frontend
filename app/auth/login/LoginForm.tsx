@@ -61,7 +61,7 @@ const LoginForm = () => {
           email: values.email,
           password: values.password,
           // If you want to control where to go after login:
-          callbackUrl: "/dashboard",
+          callbackUrl: "/main/dashboard",
         });
         if (!res) {
           console.log("Login failed", res);
@@ -94,7 +94,7 @@ const LoginForm = () => {
           });
 
           //res.url will be the callbackUrl we provided above
-          router.replace(res.url || "/dashboard");
+          router.replace(res.url || "/main/dashboard");
           return;
         }
       } catch (error: unknown) {
