@@ -16,11 +16,11 @@ import Link from "next/link";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useRouter } from "next/navigation";
-import { signin } from "next-auth/react";
+// import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 const LoginForm = () => {
-  const router = useRouter();
+  // const router = useRouter();
 
   const initialValues = {
     email: "",
@@ -39,33 +39,44 @@ const LoginForm = () => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: async (values, { setFieldError }) => {
+    onSubmit: async (values) => {
       try {
-        const res = await signin("credentials", {
+        const res = await signIn("credentials", {
           redirect: false,
           email: values.email,
           password: values.password,
         });
-
-        if (res?.error) {
-        }
-      } catch (error) {
-        const errMessage =
-          error instanceof ApolloError
-            ? error.graphQLErrors[0]?.message || "Something went wrong"
-            : "Something went wrong";
-
-        if (error instanceof ApolloError) {
-          if (errMessage.toLowerCase().includes("password")) {
-            setFieldError("password", errMessage);
-          }
-        } else {
+        if (!res) {
+          console.log("Login failed", res);
           toaster.create({
-            title: errMessage,
+            title: "Login failed",
+            description: "Something went wrong. Please try again.",
             type: "error",
             duration: 5000,
           });
+          return;
         }
+        if (res.ok && !res.error) {
+          console.log("✅Login successful", res);
+          return;
+        }
+
+        if (res?.error) {
+          toaster.create({
+            title: "Login failed",
+            description: "Invalid email or password.",
+            type: "error",
+            duration: 5000,
+          });
+          return;
+        }
+        console.log("Login successful", res);
+      } catch (error) {
+        toaster.create({
+          title: "errMessage",
+          type: "error",
+          duration: 5000,
+        });
       }
     },
   });
@@ -141,8 +152,8 @@ const LoginForm = () => {
                 fontWeight="bold"
                 size="lg"
                 w="full"
-                disabled={loading || formik.isSubmitting}
-                loading={loading || formik.isSubmitting}
+                // disabled={loading || formik.isSubmitting}
+                // loading={loading || formik.isSubmitting}
                 loadingText="Signing in..."
               >
                 Sign In

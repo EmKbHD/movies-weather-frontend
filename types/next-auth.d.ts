@@ -7,26 +7,22 @@ declare module "next-auth" {
     firstName: string;
     lastName: string;
     email: string;
-    password: string;
     city?: string;
     apiToken: string;
+  }
+
+  // Session Interface
+  interface Session extends DefaultSession {
+    user: User;
   }
 
   // JWT Interface
   interface jwt {
     id: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    city: string;
+    city?: string;
     apiToken: string;
-  }
-
-  // Session Interface
-  interface Session {
-    user: {
-      id: string;
-      email: string;
-      city: string;
-      apiToken: string;
-    } & DefaultSession["user"];
   }
 }

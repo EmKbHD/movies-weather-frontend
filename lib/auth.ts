@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -6,14 +6,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     Credentials({
       credentials: { email: {}, password: {} },
       authorize: async (credentials) => {
-        if (!credentials.email || !credentials.password) {
-          return null;
-        }
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new CredentialsSignin("Email and password required!");
+          }
 
-        // Perform the login mutation to your GraphQL server
-        const query = `
-          mutation logIn($input:LogInInput!){
-            logIn(input:$input){
+          // Perform the login mutation to your GraphQL server
+          const query = `
+          mutation login($input:LogInInput!){
+            login(input:$input){
                 user{
                     id
                     firstName
@@ -26,44 +27,58 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           }
         `;
 
-        const response = await fetch(process.env.GRAPHQL_URL as string, {
-          method: "POST",
-          headers: {
-            "content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            query,
-            variables: {
-              input: {
-                email: credentials.email,
-                password: credentials.password,
-              },
+          const response = await fetch(process.env.GRAPHQL_URL as string, {
+            method: "POST",
+            headers: {
+              "content-Type": "application/json",
+              Accept: "application/json",
             },
-          }),
-        });
+            body: JSON.stringify({
+              query,
+              variables: {
+                input: {
+                  email: credentials.email,
+                  password: credentials.password,
+                },
+              },
+            }),
+          });
 
-        if (!response.ok) {
-          throw new Error(`Login request failed (${response.status}) !`);
+          // Network / server status error
+          if (!response.ok) {
+            throw new CredentialsSignin(
+              `Login request failed (${response.status}) !`,
+            );
+          }
+
+          const results = await response.json();
+
+          console.log("GraphQL json:", JSON.stringify(results, null, 2));
+
+          const login = results?.data?.login ?? null;
+
+          if (!login?.user || !login?.token) {
+            throw new CredentialsSignin("Invalid email or password!");
+          }
+
+          const { user, token } = login;
+
+          // Return a shape compatible with our extended User type
+          return {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            city: user.city,
+            apiToken: token,
+          };
+        } catch (error) {
+          // Re-throw as CredentialsSignin so Auth.js shows the correct error state
+          if (error instanceof CredentialsSignin) throw error;
+          throw new CredentialsSignin(
+            (error as Error)?.message || "Signin failed!",
+          );
         }
-
-        const results = await response.json();
-
-        const login = results?.data?.login ?? null;
-
-        if (!login || !login.user) return null;
-
-        const { user, token } = login;
-
-        return {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          city: user.city,
-          password: credentials.password as string,
-          apiToken: token,
-        };
       },
     }),
   ],
