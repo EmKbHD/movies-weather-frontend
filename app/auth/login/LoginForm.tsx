@@ -36,11 +36,13 @@ const LoginForm = () => {
     }
   }, [searchParams]);
 
+  // form initial value
   const initialValues = {
     email: "",
     password: "",
   };
 
+  // form validation schema
   const validationSchema = Yup.object({
     email: Yup.string()
       .email("Invalid email address.")
@@ -50,6 +52,7 @@ const LoginForm = () => {
       .required("Password is required."),
   });
 
+  // form submit handler
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -60,6 +63,7 @@ const LoginForm = () => {
           redirect: false,
           email: values.email,
           password: values.password,
+
           // If you want to control where to go after login:
           callbackUrl: "/main/dashboard",
         });
@@ -75,7 +79,7 @@ const LoginForm = () => {
         }
 
         if (res.error) {
-          // This string comes from our `authorize` → CredentialsSignin(message)
+          // This string comes from our 'authorize' → CredentialsSignin(message)
           toaster.create({
             title: "Login failed",
             description: res.error || "Invalid email or password.",
@@ -87,6 +91,7 @@ const LoginForm = () => {
 
         if (res.ok && !res.error) {
           console.log("✅Login successful", res);
+
           toaster.create({
             title: "Welcome back!",
             type: "success",
