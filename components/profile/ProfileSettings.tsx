@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import EditProfileForm from "./EditProfileForm";
@@ -30,9 +31,29 @@ export default function ProfileSettings() {
           Set up your personal details
         </Text>
       </Stack>
-      <Flex>
-        <Box>
-          <Stack>
+      <Flex
+        direction={{ base: "column", lg: "row" }}
+        gap={{ base: 8, lg: 12 }}
+        align="flex-start"
+      >
+        <Box
+          flexShrink={0}
+          minW={{ base: "full", lg: "15rem" }}
+          width={{ base: "full", lg: "18rem" }}
+        >
+          <Stack
+            gap={3}
+            bg="rgba(15, 15, 15, 0.88)"
+            borderRadius="2xl"
+            borderWidth="1px"
+            borderColor="whiteAlpha.200"
+            px={{ base: 4, md: 5 }}
+            py={{ base: 5, md: 6 }}
+            boxShadow="0 24px 48px rgba(0, 0, 0, 0.4)"
+            backdropFilter="blur(24px) saturate(140%)"
+            position={{ base: "static", lg: "sticky" }}
+            top={{ base: "auto", lg: "6rem" }}
+          >
             <Text>General</Text>
             {sections.map((section) => {
               // Active state for button
