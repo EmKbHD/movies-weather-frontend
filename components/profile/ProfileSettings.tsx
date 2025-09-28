@@ -54,7 +54,14 @@ export default function ProfileSettings() {
             position={{ base: "static", lg: "sticky" }}
             top={{ base: "auto", lg: "6rem" }}
           >
-            <Text>General</Text>
+            <Text
+              textTransform="uppercase"
+              fontSize="xs"
+              color="whiteAlpha.600"
+              letterSpacing="0.18em"
+            >
+              General
+            </Text>
             {sections.map((section) => {
               // Active state for button
               const isActive = activeSection === section.id;
@@ -81,7 +88,7 @@ export default function ProfileSettings() {
           </Stack>
         </Box>
         {/* change password */}
-        <Box>
+        <Box flex={1} width="full">
           {activeSection === "edit-profile" ? (
             <EditProfileForm />
           ) : (
