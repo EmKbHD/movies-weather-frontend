@@ -2,139 +2,395 @@
 
 import * as React from "react";
 import NextLink from "next/link";
-import { NetFlixText } from "./NetFlixText";
+import { useRouter } from "next/navigation";
 import {
+  Avatar,
+  // AvatarImage,
+  // AvatarBadge,
+  AvatarIcon,
   Box,
+  Button,
+  // Divider,
   Flex,
   HStack,
   IconButton,
-  Button,
-  Text,
-  Stack,
   Link,
+  Menu,
+  Portal,
+  Stack,
+  Text,
+  chakra,
 } from "@chakra-ui/react";
 import { FiMenu, FiX } from "react-icons/fi";
-import { useSession, signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+
+const NavbarMenuItems = [
+  { label: "Dashboard", href: "/main/dashboard" },
+  { label: "Movies", href: "/main/movies" },
+  { label: "Favorites", href: "/main/favorites" },
+];
+
+type SessionUser = {
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+  city?: string | null;
+  // apiToken?: string | null;
+};
+
+function getDisplayName(user: SessionUser) {
+  const { firstName, lastName, email } = user;
+  const name = [firstName, lastName].filter(Boolean).join(" ").trim();
+  return name.length > 0 ? name : (email ?? "My Account");
+}
+
+function ProfileMenu({ user }: { user: SessionUser }) {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const handleNavigate = React.useCallback(
+    (path: string) => {
+      setIsOpen(false);
+      router.push(path);
+    },
+    [router],
+  );
+
+  const handleSignOut = React.useCallback(() => {
+    setIsOpen(false);
+    void signOut({ callbackUrl: "/auth/login" });
+  }, []);
+
+  const displayName = React.useMemo(() => getDisplayName(user), [user]);
+  const displayEmail = user.email ?? "";
+
+  return (
+    <Menu.Root
+      open={isOpen}
+      onOpenChange={({ open }) => setIsOpen(open)}
+      positioning={{ placement: "bottom-end", gutter: 12 }}
+    >
+      <Menu.Trigger asChild>
+        <chakra.button
+          type="button"
+          aria-label="Open profile menu"
+          rounded="full"
+          p="0.5"
+          bg="rgba(26, 26, 26, 0.8)"
+          borderWidth="1px"
+          borderColor={isOpen ? "brand-red" : "whiteAlpha.200"}
+          transition="all 0.2s ease"
+          display="inline-flex"
+          alignItems="center"
+          justifyContent="center"
+          boxShadow={
+            isOpen
+              ? "0 0 0 1px rgba(229, 9, 20, 0.4), 0 18px 40px rgba(0,0,0,0.4)"
+              : "0 12px 30px rgba(0,0,0,0.35)"
+          }
+          backdropFilter="blur(18px) saturate(140%)"
+          _hover={{
+            borderColor: "brand-red",
+            bg: "rgba(45, 45, 45, 0.85)",
+          }}
+          _focusVisible={{
+            outline: "none",
+            boxShadow: "0 0 0 2px rgba(229, 9, 20, 0.5)",
+          }}
+        >
+          <Avatar.Root
+            size="sm"
+            // name={displayName}
+            // src={user.image ?? undefined}
+            bg="brand-red-dark"
+            color="white"
+          >
+            <AvatarIcon
+              boxSize="0.75rem"
+              bg="green.400"
+              borderColor="rgba(0,0,0,0.85)"
+            />
+          </Avatar.Root>
+        </chakra.button>
+      </Menu.Trigger>
+      <Portal>
+        <Menu.Positioner zIndex="popover">
+          <Menu.Content
+            divideX="1px"
+            w="18rem"
+            borderRadius="xl"
+            overflow="hidden"
+            borderWidth="1px"
+            borderColor="whiteAlpha.200"
+            bg="rgba(18, 18, 18, 0.92)"
+            backdropFilter="blur(22px) saturate(140%)"
+            boxShadow="0 25px 50px rgba(0, 0, 0, 0.55)"
+            color="whiteAlpha.900"
+          >
+            <Stack align="center" gap={3} px={6} pt={6} pb={5}>
+              <Avatar.Root
+                size="lg"
+                // name={displayName}
+                // src={user.image ?? undefined}
+                bg="brand-red"
+                color="white"
+              >
+                <AvatarIcon
+                  boxSize="0.85rem"
+                  bg="green.400"
+                  borderColor="rgba(18, 18, 18, 0.92)"
+                />
+              </Avatar.Root>
+              <Stack align="center" gap={1}>
+                <Text fontWeight="semibold" fontSize="lg">
+                  {displayName}
+                </Text>
+                {displayEmail ? (
+                  <Text fontSize="sm" color="whiteAlpha.700">
+                    {displayEmail}
+                  </Text>
+                ) : null}
+              </Stack>
+            </Stack>
+            {/* <Divider borderColor="whiteAlpha.200" /> */}
+            <Stack py={2} gap={1}>
+              <Menu.Item
+                value="profile"
+                px={6}
+                py={3}
+                cursor="pointer"
+                _hover={{ bg: "whiteAlpha.100" }}
+                _focus={{ bg: "whiteAlpha.100" }}
+                onClick={() => handleNavigate("/main/profile")}
+              >
+                <Text fontWeight="medium">Manage Profile</Text>
+              </Menu.Item>
+              {/* <Divider borderColor="whiteAlpha.200" mx={6} /> */}
+              <Menu.Item
+                value="signout"
+                px={6}
+                py={3}
+                cursor="pointer"
+                color="red.300"
+                _hover={{ bg: "rgba(229, 9, 20, 0.08)", color: "red.200" }}
+                _focus={{ bg: "rgba(229, 9, 20, 0.12)", color: "red.200" }}
+                onClick={handleSignOut}
+              >
+                <Text fontWeight="medium">Sign Out</Text>
+              </Menu.Item>
+            </Stack>
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
+    </Menu.Root>
+  );
+}
 
 export default function Navbar() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
   const { data } = useSession();
-  const user = data?.user;
+  const user = data?.user as SessionUser | undefined;
 
-  const toggle = () => setIsOpen((s) => !s);
+  const toggleMobileMenu = React.useCallback(() => {
+    setIsOpen((prev) => !prev);
+  }, []);
+
+  const closeMobileMenu = React.useCallback(() => setIsOpen(false), []);
 
   return (
     <Box
       as="header"
+      position="sticky"
+      top="0"
+      zIndex="banner"
       borderBottomWidth="1px"
-      borderColor="whiteAlpha.300"
-      bg="blackAlpha.800"
+      borderColor="whiteAlpha.200"
+      bg="rgba(10, 10, 10, 0.85)"
+      backdropFilter="blur(18px)"
+      // sx={{ WebkitBackdropFilter: "blur(18px)" }}
     >
-      <Flex h={16} align="center" px={{ base: 4, md: 8 }} color="white">
-        <IconButton
-          aria-label={isOpen ? "Close menu" : "Open menu"}
-          onClick={toggle}
-          display={{ base: "inline-flex", md: "none" }}
-          variant="ghost"
-          color="white"
-        >
-          {isOpen ? <FiX size={20} /> : <FiMenu size={20} />}
-        </IconButton>
-
-        <HStack gap={8} align="center" flex="1">
-          <NextLink href="/main/dashboard" passHref>
-            <Link _hover={{ textDecor: "none", color: "brand-red" }}>
-              <NetFlixText
-                fontWeight="bold"
-                fontSize={{ base: "25px", md: "30px", lg: "40px" }}
-                color="brand-red-dark"
+      <Flex
+        h="4.5rem"
+        align="center"
+        justify="space-between"
+        px={{ base: 4, md: 8, lg: 12 }}
+        color="white"
+      >
+        <HStack gap={{ base: 4, md: 8 }} align="center" flex="1">
+          <Link
+            as={NextLink}
+            href="/main/dashboard"
+            _hover={{ textDecor: "none", color: "brand-red" }}
+          >
+            <Text
+              fontSize={{ base: "25px", md: "30px", lg: "40px" }}
+              color="brand-red-dark"
+              as="span"
+              textTransform="uppercase"
+              fontFamily="'Bebas Neue','Anton',Impact,'Arial Black',sans-serif"
+              fontWeight="900"
+              lineHeight="0.9"
+              letterSpacing="-0.04em"
+            >
+              MovieWeather
+            </Text>
+          </Link>
+          <HStack
+            as="nav"
+            gap={5}
+            display={{ base: "none", md: "flex" }}
+            fontSize="sm"
+            fontWeight="medium"
+            color="whiteAlpha.800"
+          >
+            {NavbarMenuItems.map((item) => (
+              <Link
+                as={NextLink}
+                key={item.href}
+                _hover={{ textDecor: "none", color: "red.300" }}
+                href={item.href}
               >
-                MovieWeather
-              </NetFlixText>
-            </Link>
-          </NextLink>
-
-          <HStack as="nav" gap={4} display={{ base: "none", md: "flex" }}>
-            <NextLink href="/main/dashboard" passHref>
-              <Link _hover={{ textDecor: "none", color: "red.300" }}>
-                Dashboard
+                {item.label}
               </Link>
-            </NextLink>
-            <NextLink href="/movies" passHref>
-              <Link _hover={{ textDecor: "none", color: "red.300" }}>
-                Movies
-              </Link>
-            </NextLink>
-            <NextLink href="/weather" passHref>
-              <Link _hover={{ textDecor: "none", color: "red.300" }}>
-                Favorites
-              </Link>
-            </NextLink>
+            ))}
           </HStack>
         </HStack>
 
-        <HStack gap={3}>
+        <HStack gap={3} justify="flex-end">
           {user ? (
-            <>
-              <Text
-                display={{ base: "none", md: "block" }}
-                color="whiteAlpha.800"
-              >
-                {user.firstName ? `Hi, ${user.firstName}` : user.email}
-              </Text>
-              <Button
-                colorPalette="red"
-                size="sm"
-                onClick={() => signOut({ callbackUrl: "/auth/login" })}
-              >
-                Sign out
-              </Button>
-            </>
+            <ProfileMenu user={user} />
           ) : (
-            <NextLink href="/auth/login" passHref>
-              <Button as={Link} colorPalette="red" size="sm">
+            <Link as={NextLink} href="/auth/login">
+              <Button colorPalette="red" size="sm">
                 Sign in
               </Button>
-            </NextLink>
+            </Link>
           )}
+          <IconButton
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-nav"
+            onClick={toggleMobileMenu}
+            display={{ base: "inline-flex", md: "none" }}
+            variant="ghost"
+            color="white"
+            // icon=
+            rounded="full"
+            borderWidth="1px"
+            borderColor={isOpen ? "brand-red" : "transparent"}
+            bg={isOpen ? "rgba(229, 9, 20, 0.12)" : "transparent"}
+            _hover={{
+              bg: "rgba(255, 255, 255, 0.08)",
+              backdropFilter: "blur(16px)",
+            }}
+            _active={{
+              bg: "rgba(229, 9, 20, 0.18)",
+            }}
+          >
+            {isOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+          </IconButton>
         </HStack>
       </Flex>
 
-      {/* mobile menu */}
       {isOpen ? (
-        <Box
-          px={{ base: 4, md: 8 }}
-          pb={4}
-          display={{ md: "none" }}
-          color="white"
-        >
-          <Stack as="nav" gap={3}>
-            <NextLink href="/dashboard" passHref>
-              <Link
-                _hover={{ color: "red.300" }}
-                onClick={() => setIsOpen(false)}
-              >
-                Dashboard
-              </Link>
-            </NextLink>
-            <NextLink href="/movies" passHref>
-              <Link
-                _hover={{ color: "red.300" }}
-                onClick={() => setIsOpen(false)}
-              >
-                Movies
-              </Link>
-            </NextLink>
-            <NextLink href="/favorites" passHref>
-              <Link
-                _hover={{ color: "red.300" }}
-                onClick={() => setIsOpen(false)}
-              >
-                Weather
-              </Link>
-            </NextLink>
-          </Stack>
-        </Box>
+        <>
+          <Box
+            position="fixed"
+            top="4.5rem"
+            left="0"
+            right="0"
+            bottom="0"
+            bg="rgba(10, 10, 10, 0.55)"
+            backdropFilter="blur(16px)"
+            zIndex="modal"
+            onClick={closeMobileMenu}
+          />
+          <Box
+            id="mobile-nav"
+            role="dialog"
+            aria-modal="true"
+            position="fixed"
+            top="4.5rem"
+            left="0"
+            right="0"
+            zIndex="modal"
+            px={{ base: 4, sm: 6 }}
+            py={4}
+          >
+            <Box
+              bg="rgba(18, 18, 18, 0.95)"
+              borderRadius="2xl"
+              borderWidth="1px"
+              borderColor="whiteAlpha.200"
+              boxShadow="0 30px 80px rgba(0,0,0,0.65)"
+              backdropFilter="blur(22px) saturate(160%)"
+              px={{ base: 5, sm: 7 }}
+              py={{ base: 6, sm: 7 }}
+              color="white"
+            >
+              <Stack gap={6}>
+                <Stack as="nav" gap={4} fontSize="lg" fontWeight="medium">
+                  {NavbarMenuItems.map((item) => (
+                    <Link
+                      as={NextLink}
+                      key={item.href}
+                      href={item.href}
+                      _hover={{ textDecor: "none", color: "red.300" }}
+                      onClick={closeMobileMenu}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </Stack>
+
+                {user ? (
+                  <Stack gap={4} divideX="1px">
+                    {/* <Divider borderColor="whiteAlpha.200" /> */}
+                    <Button
+                      justifyContent="flex-start"
+                      variant="ghost"
+                      colorPalette="gray"
+                      _hover={{ bg: "whiteAlpha.100" }}
+                      onClick={() => {
+                        closeMobileMenu();
+                        router.push("/main/profile");
+                      }}
+                    >
+                      Manage Profile
+                    </Button>
+                    <Button
+                      justifyContent="flex-start"
+                      variant="ghost"
+                      color="red.300"
+                      _hover={{
+                        bg: "rgba(229, 9, 20, 0.12)",
+                        color: "red.200",
+                      }}
+                      onClick={() => {
+                        closeMobileMenu();
+                        void signOut({ callbackUrl: "/auth/login" });
+                      }}
+                    >
+                      Sign Out
+                    </Button>
+                  </Stack>
+                ) : (
+                  <Link as={NextLink} href="/auth/login">
+                    <Button
+                      as={NextLink}
+                      colorPalette="red"
+                      size="md"
+                      onClick={closeMobileMenu}
+                    >
+                      Sign In
+                    </Button>
+                  </Link>
+                )}
+              </Stack>
+            </Box>
+          </Box>
+        </>
       ) : null}
     </Box>
   );
