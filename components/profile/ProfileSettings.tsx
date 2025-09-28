@@ -1,4 +1,7 @@
 import * as React from "react";
+import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import EditProfileForm from "./EditProfileForm";
+import ChangePasswordForm from "./ChangePasswordForm";
 
 const sections = [
   { id: "edit-profile", title: "Edit Profile" },
@@ -6,7 +9,9 @@ const sections = [
 ];
 
 export default function ProfileSettings() {
-  const [activeSection, setActiveSection] = React.useState(sections[0].id);
+  const [activeSection, setActiveSection] = React.useState<string>(
+    sections[0].id,
+  );
 
   return (
     <Stack
@@ -25,7 +30,44 @@ export default function ProfileSettings() {
           Set up your personal details
         </Text>
       </Stack>
-      <Flex></Flex>
+      <Flex>
+        <Box>
+          <Stack>
+            <Text>General</Text>
+            {sections.map((section) => {
+              // Active state for button
+              const isActive = activeSection === section.id;
+
+              return (
+                <Button
+                  key={section.id}
+                  variant="ghost"
+                  justifyContent="flex-start"
+                  fontWeight={isActive ? "semibold" : "medium"}
+                  color={isActive ? "white" : "whiteAlpha.700"}
+                  bg={isActive ? "rgba(229, 9, 20, 0.16)" : "transparent"}
+                  _hover={{
+                    bg: "rgba(229, 9, 20, 0.16)",
+                    color: "white",
+                  }}
+                  _active={{ bg: "rgba(229, 9, 20, 0.24)" }}
+                  onClick={() => setActiveSection(section.id)}
+                >
+                  {section.title}
+                </Button>
+              );
+            })}
+          </Stack>
+        </Box>
+        {/* change password */}
+        <Box>
+          {activeSection === "edit-profile" ? (
+            <EditProfileForm />
+          ) : (
+            <ChangePasswordForm />
+          )}
+        </Box>
+      </Flex>
     </Stack>
   );
 }
