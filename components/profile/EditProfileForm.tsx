@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import {
   Avatar,
   Box,
+  Button,
   Heading,
   Stack,
   Text,
@@ -30,18 +31,22 @@ export default function EditProfileForm() {
   const user = data?.user;
   return (
     <Box>
-      <Stack>
+      <Stack gap={8}>
         {/* Title and Description */}
-        <Stack>
+        <Stack gap={1}>
           <Heading>Edit Profile</Heading>
           <Text>
             Refresh how you appear to others and keep your details up-to-date .
           </Text>
         </Stack>
 
-        <Stack>
-          <Stack>
-            <Flex>
+        <Stack gap={6}>
+          <Stack gap={4}>
+            <Flex
+              direction={{ base: "column", sm: "row" }}
+              align={{ base: "flex-start", sm: "center" }}
+              gap={6}
+            >
               <Avatar.Root>
                 <Avatar.Fallback
                   name={previewName}
@@ -51,17 +56,48 @@ export default function EditProfileForm() {
               </Avatar.Root>
             </Flex>
           </Stack>
-        </Stack>
-        <form action="">
-          <Stack>
-            <SimpleGrid>
-              {/* first name field */}
+
+          {/* Form starts here */}
+          <form onSubmit={}>
+            <Stack gap={6}>
+              <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
+                {/* first name field */}
+                <Field.Root>
+                  <Field.Label color="whiteAlpha.800">First Name</Field.Label>
+                  <Input
+                    name="firstName"
+                    placeholder="First Name"
+                    defaultValue={user?.firstName || ""}
+                    value={}
+                    onChange={}
+                    onBlur={}
+                    {...fieldStyles}
+                  />
+                </Field.Root>
+
+                {/* last name field */}
+                <Field.Root>
+                  <Field.Label color="whiteAlpha.800">Last Name</Field.Label>
+                  <Input
+                    name="lastName"
+                    placeholder="Last Name"
+                    defaultValue={user?.lastName || ""}
+                    value={}
+                    onChange={}
+                    onBlur={}
+                    {...fieldStyles}
+                  />
+                </Field.Root>
+              </SimpleGrid>
+
+              {/* email field */}
               <Field.Root>
-                <Fiel.Label>First Name</Fiel.Label>
+                <Field.Label color="whiteAlpha.800">Email Address</Field.Label>
                 <Input
-                  name="firstName"
-                  placeholder="First Name"
-                  defaultValue={user?.firstName || ""}
+                  name="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  defaultValue={user?.email || ""}
                   value={}
                   onChange={}
                   onBlur={}
@@ -69,22 +105,36 @@ export default function EditProfileForm() {
                 />
               </Field.Root>
 
-              {/* last name field */}
+              {/* location field */}
               <Field.Root>
-                <Field.Label>Last Name</Field.Label>
+                <Field.Label color="whiteAlpha.800">City</Field.Label>
                 <Input
-                  name="lastName"
-                  placeholder="Last Name"
-                  defaultValue={user?.lastName || ""}
+                  name="city"
+                  placeholder="Your location"
                   value={}
                   onChange={}
                   onBlur={}
                   {...fieldStyles}
                 />
               </Field.Root>
-            </SimpleGrid>
-          </Stack>
-        </form>
+
+              {/* Button to submit the form */}
+              <Flex justify="flex-end">
+                <Button
+                  type="submit"
+                  colorPalette="red"
+                  size="lg"
+                  fontWeight="semibold"
+                  loading={}
+                  loadingText="Saving..."
+                  disabled={}
+                >
+                  Save changes
+                </Button>
+              </Flex>
+            </Stack>
+          </form>
+        </Stack>
       </Stack>
     </Box>
   );
