@@ -124,7 +124,7 @@ export default function ChangePasswordForm() {
         </Stack>
 
         {/* update password FORM */}
-        <form action="" onSubmit={formik.handleSubmit} noValidate>
+        <form onSubmit={formik.handleSubmit} noValidate>
           <Stack gap={6}>
             <Field.Root>
               <Field.Label color="whiteAlpha.800">Current password</Field.Label>

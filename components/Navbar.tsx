@@ -5,12 +5,9 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Avatar,
-  // AvatarImage,
-  // AvatarBadge,
   AvatarIcon,
   Box,
   Button,
-  // Divider,
   Flex,
   HStack,
   IconButton,
@@ -35,7 +32,6 @@ type SessionUser = {
   lastName?: string | null;
   email?: string | null;
   city?: string | null;
-  // apiToken?: string | null;
 };
 
 function getDisplayName(user: SessionUser) {
@@ -189,6 +185,7 @@ function ProfileMenu({ user }: { user: SessionUser }) {
 export default function Navbar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
+
   const { data } = useSession();
   const user = data?.user as SessionUser | undefined;
 
@@ -208,7 +205,7 @@ export default function Navbar() {
       borderColor="whiteAlpha.200"
       bg="rgba(10, 10, 10, 0.85)"
       backdropFilter="blur(18px)"
-      // sx={{ WebkitBackdropFilter: "blur(18px)" }}
+      boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)"
     >
       <Flex
         h="4.5rem"

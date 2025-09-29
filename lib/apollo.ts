@@ -9,7 +9,7 @@ const httpLink = createHttpLink({
 
 // 2. Add the authLink to inject the token
 const authLink = setContext((_, { headers }) => {
-  // Read token from localStorage on the client
+  // ---- Read token from localStorage on the client ----
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
