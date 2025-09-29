@@ -36,6 +36,7 @@ const SearchMovie = () => {
   const formik = useFormik({
     initialValues,
     validationSchema,
+    validateOnBlur: false,
     onSubmit: async (values, helpers) => {
       try {
         // handle search logic here
@@ -54,8 +55,13 @@ const SearchMovie = () => {
     },
   });
 
-  // If any formik error
-  const hasError = !!(formik.touched.search && formik.errors.search);
+  // If any formik error (Keep blur validation, but don’t show message unless user typed something)
+  const hasTyped = formik.values.search.trim().length > 0;
+  const showError = !!(
+    formik.touched.search &&
+    formik.errors.search &&
+    hasTyped
+  );
 
   return (
     <>
@@ -78,7 +84,7 @@ const SearchMovie = () => {
 
           <Button
             type="submit"
-            colorPalette="brand-red"
+            colorPalette="red"
             size="lg"
             marginLeft=".5rem"
             fontWeight="semi-bold"
@@ -88,7 +94,7 @@ const SearchMovie = () => {
             Search
           </Button>
         </Flex>
-        {hasError && (
+        {showError && (
           <Text color="brand-red-dark" mt={2} fontSize="sm">
             {formik.errors.search}
           </Text>
