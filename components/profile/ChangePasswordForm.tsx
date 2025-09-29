@@ -114,11 +114,13 @@ export default function ChangePasswordForm() {
       py={{ base: 6, md: 8 }}
       backdropFilter="blur(28px) saturate(140%)"
     >
-      <Stack>
+      <Stack gap={8}>
         {/* update password HEADING */}
-        <Stack>
-          <Heading>Update Password</Heading>
-          <Text>Choose a strong password to keep your account protected.</Text>
+        <Stack gap={1}>
+          <Heading size="lg">Update Password</Heading>
+          <Text color="whiteAlpha.700" fontSize="sm">
+            Choose a strong password to keep your account protected.
+          </Text>
         </Stack>
 
         {/* update password FORM */}
@@ -141,7 +143,6 @@ export default function ChangePasswordForm() {
                 </Text>
               ) : null}
             </Field.Root>
-
             <Field.Root>
               <Field.Label color="whiteAlpha.800">New password</Field.Label>
               <Stack gap={3}>
@@ -162,8 +163,20 @@ export default function ChangePasswordForm() {
               ) : null}
             </Field.Root>
             <Field.Root></Field.Root>
-            <Flex>
-              <Button>Update password</Button>
+
+            {/* Button to submit the form */}
+            <Flex justify="flex-end">
+              <Button
+                type="submit"
+                colorPalette="red"
+                size="lg"
+                fontWeight="semibold"
+                loading={formik.isSubmitting}
+                loadingText="Updating..."
+                disabled={formik.isSubmitting}
+              >
+                Update password
+              </Button>
             </Flex>
           </Stack>
         </form>
