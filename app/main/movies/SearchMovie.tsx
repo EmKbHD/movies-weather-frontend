@@ -1,11 +1,13 @@
+"use client";
+
 import React from "react";
 
-import { Box, Input, Button } from "@chakra-ui/react";
+import { Flex, Input, Button, Field, Text } from "@chakra-ui/react";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-// input styles here
+// input styles
 const inputStyles = {
   bg: "rgba(32, 32, 32, 0.9)",
   borderColor: "transparent",
@@ -17,17 +19,19 @@ const inputStyles = {
   },
 };
 
-// initial form values
-const initialValues = {
-  searchMovie: "",
-};
-
-// validation schema
-const validationSchema = Yup.object({
-  query: Yup.string().required("Please enter a search query"),
-});
-
 const SearchMovie = () => {
+  // initial form values
+  const initialValues = {
+    search: "",
+  };
+
+  // validation schema
+  const validationSchema = Yup.object({
+    search: Yup.string()
+      .trim()
+      .required("Please enter a movie title to search.."),
+  });
+
   // formik hook for form state management and handle submission
   const formik = useFormik({
     initialValues,
@@ -35,8 +39,13 @@ const SearchMovie = () => {
     onSubmit: async (values, helpers) => {
       try {
         // handle search logic here
-        console.log("Searching for movie:", values.searchMovie);
-        helpers.setSubmitting(false);
+        console.log("Searching for movie:", values.search);
+
+        const query = values.search.trim();
+
+        if (!query) return;
+        console.log("Searching for movie:", query);
+        // search movie API call for search
       } catch (error) {
         console.error("Search failed:", error);
       } finally {
@@ -45,31 +54,47 @@ const SearchMovie = () => {
     },
   });
 
-  return (
-    <Box>
-      <form noValidate onSubmit={formik.handleSubmit}>
-        <Input
-          name="searchMovie"
-          type="text"
-          placeholder="Search for a movie..."
-          value={formik.values.searchMovie}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          {...inputStyles}
-        />
+  // If any formik error
+  const hasError = !!(formik.touched.search && formik.errors.search);
 
-        <Button
-          type="submit"
-          colorPalette="brand-red"
-          size="lg"
-          fontWeight="semi-bold"
-          loading={formik.isSubmitting}
-          disabled={formik.isSubmitting}
-        >
-          Search
-        </Button>
+  return (
+    <>
+      <form onSubmit={formik.handleSubmit} noValidate>
+        <Flex>
+          <Field.Root>
+            <Input
+              name="search"
+              type="text"
+              size="lg"
+              w="full"
+              minW="sm"
+              placeholder="Search for a movie..."
+              value={formik.values.search}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              {...inputStyles}
+            />
+          </Field.Root>
+
+          <Button
+            type="submit"
+            colorPalette="brand-red"
+            size="lg"
+            marginLeft=".5rem"
+            fontWeight="semi-bold"
+            loading={formik.isSubmitting}
+            disabled={formik.isSubmitting || !formik.values.search.trim()}
+          >
+            Search
+          </Button>
+        </Flex>
+        {hasError && (
+          <Text color="brand-red-dark" mt={2} fontSize="sm">
+            {formik.errors.search}
+          </Text>
+        )}
       </form>
-    </Box>
+    </>
   );
 };
 
