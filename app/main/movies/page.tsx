@@ -1,9 +1,18 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 
 import { Box, Heading, Text, VStack } from "@chakra-ui/react";
 import SearchMovie from "./SearchMovie";
+import MovieGrid from "./MovieGrid";
+
+import { SEARCH_MOVIE } from "@/lib/graphql";
+import { useQuery } from "@apollo/client";
 
 export default function MoviePage() {
+  const { data, loading } = useQuery(SEARCH_MOVIE, {
+    fetchPolicy: "network-only",
+  });
+
   return (
     <Box minH="full">
       <VStack align="center" mt="4rem">
@@ -12,8 +21,9 @@ export default function MoviePage() {
           Powered by OMDB API
         </Text>
 
-        {/* Search bar component */}
+        {/* Search bar + Movie Grid component */}
         <SearchMovie />
+        <MovieGrid movies={data} loading={loading} />
       </VStack>
     </Box>
   );

@@ -9,6 +9,8 @@ import * as Yup from "yup";
 
 // input styles
 const inputStyles = {
+  w: "full",
+  minW: "sm",
   bg: "rgba(32, 32, 32, 0.9)",
   borderColor: "transparent",
   color: "text-primary",
@@ -72,8 +74,6 @@ const SearchMovie = () => {
               name="search"
               type="text"
               size="lg"
-              w="full"
-              minW="sm"
               placeholder="Search for a movie..."
               value={formik.values.search}
               onChange={formik.handleChange}
