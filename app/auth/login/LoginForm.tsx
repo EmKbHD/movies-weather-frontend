@@ -195,8 +195,8 @@ const LoginForm = () => {
           </Stack>
         </form>
         <Stack
-          direction={{ base: "column", md: "row" }}
-          justifyContent={{ md: "space-between" }}
+          direction={{ base: "column", sm: "row" }}
+          justifyContent={{ sm: "space-between" }}
           gap={2}
           fontSize="sm"
           color="whiteAlpha.800"
