@@ -2,6 +2,13 @@ import { createSystem, defaultConfig } from "@chakra-ui/react";
 
 export const system = createSystem(defaultConfig, {
   theme: {
+    // 1) Add keyframes
+    keyframes: {
+      spin: {
+        from: { transform: "rotate(0deg)" },
+        to: { transform: "rotate(360deg)" },
+      },
+    },
     tokens: {
       cursor: {
         button: { value: "pointer" },
@@ -31,6 +38,11 @@ export const system = createSystem(defaultConfig, {
       },
       shadows: {
         glow: { value: "0 0 2px rgba(229, 9, 20, 0.6)" },
+      },
+      // Add an animation token that references the keyframe
+      animations: {
+        // name it "spin" so you can use animation="spin"
+        spin: { value: "spin 1s linear infinite" },
       },
     },
     breakpoints: {

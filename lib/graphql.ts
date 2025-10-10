@@ -8,6 +8,7 @@ export const GET_USER = gql`
       firstName
       lastName
       email
+      city
     }
   }
 `;
@@ -28,13 +29,15 @@ export const GET_CITY_WEATHER = gql`
 // Get All Favorites Movies
 
 export const FETCH_ALL_FAVORITES = gql`
-  query GetFavorites($email: String!) {
-    getFavoriteMovies(email: $email) {
-      id
-      movieId
-      title
-      year
-      poster
+  query myFavorites {
+    getFavoriteMovies {
+      movie {
+        externalId
+        title
+        year
+        type
+        poster
+      }
       createdAt
     }
   }
@@ -55,6 +58,32 @@ export const SEARCH_MOVIE = gql`
       }
       totalResults
     }
+  }
+`;
+
+// ADD TO FAVORITE
+
+export const ADD_TO_FAVORITE = gql`
+  mutation AddFavorite($externalId: String!) {
+    addFavoriteMovie(externalId: $externalId) {
+      userId
+      movie {
+        externalId
+        title
+        year
+        type
+        poster
+      }
+      createdAt
+    }
+  }
+`;
+
+// REMOVE A FAVORITE
+
+export const REMOVE_FAVORITE = gql`
+  mutation RemoveFavorite($externalId: String!) {
+    removeFavoriteMovie(externalId: $externalId)
   }
 `;
 

@@ -121,12 +121,8 @@ export default function EditProfileForm() {
               align={{ base: "flex-start", sm: "center" }}
               gap={6}
             >
-              <Avatar.Root>
-                <Avatar.Fallback
-                  name={previewName}
-                  bg="brand-red"
-                  color="white"
-                />
+              <Avatar.Root bg="brand-red" color="white" size="lg">
+                <Avatar.Fallback name={previewName} />
               </Avatar.Root>
             </Flex>
           </Stack>

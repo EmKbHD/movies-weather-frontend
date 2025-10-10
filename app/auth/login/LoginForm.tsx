@@ -7,7 +7,6 @@ import {
   Field,
   Box,
   Text,
-  Flex,
   Heading,
   Stack,
 } from "@chakra-ui/react";
@@ -195,14 +194,20 @@ const LoginForm = () => {
             </Grid>
           </Stack>
         </form>
-        <Flex gap={2} fontSize="sm" color="whiteAlpha.800">
+        <Stack
+          direction={{ base: "column", md: "row" }}
+          justifyContent={{ md: "space-between" }}
+          gap={2}
+          fontSize="sm"
+          color="whiteAlpha.800"
+        >
           <Text>New to Movie Weather App?</Text>
           <Link href="/auth/signup">
             <Text color="red.400" _hover={{ textDecor: "underline" }}>
               Create an account
             </Text>
           </Link>
-        </Flex>
+        </Stack>
       </Stack>
     </Box>
   );

@@ -26,7 +26,7 @@ const LoginPage = () => {
           <Heading
             as="h1"
             fontWeight="extrabold"
-            fontSize={{ base: "3xl", md: "5xl" }}
+            fontSize={{ base: "xl", md: "3xl", lg: "5xl" }}
             lineHeight="shorter"
           >
             Search Movie and See your Weather

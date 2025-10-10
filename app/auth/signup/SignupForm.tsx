@@ -19,6 +19,7 @@ import { SIGNUP_USER } from "@/lib/graphql";
 import { toaster } from "@/components/ui/toaster";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 const SignupForm = () => {
   const [signUp, { loading }] = useMutation(SIGNUP_USER);
@@ -28,6 +29,7 @@ const SignupForm = () => {
     firstName: "",
     lastName: "",
     email: "",
+    city: "",
     password: "",
   };
 
@@ -38,6 +40,9 @@ const SignupForm = () => {
     lastName: Yup.string()
       .matches(/^[A-Za-z'-]+$/, "Last name can only contain letters")
       .required("Last name is required"),
+    city: Yup.string()
+      .matches(/^[A-Za-z '-]+$/, "City can only contain letters and spaces")
+      .required("City is required"),
     email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
@@ -51,15 +56,66 @@ const SignupForm = () => {
     validationSchema,
     onSubmit: async (values, { setFieldError }) => {
       try {
+        // Create the user via GraphQL mutation
         const { data } = await signUp({ variables: { input: values } });
         if (data?.signUp) {
           toaster.create({
             title: "Account created",
-            description: "Welcome! Please sign in to continue.",
+            description: "Welcome!",
             type: "success",
-            duration: 4000,
+            duration: 3000,
           });
-          setTimeout(() => router.replace("/pages/signin"), 2000);
+        }
+
+        // sign in the user via the NextAuth Credentials provider
+        const loginUser = await signIn("credentials", {
+          // We pass `redirect: false` so signIn returns an object we can inspect and
+          // navigate programmatically.
+          redirect: false,
+          email: values.email,
+          password: values.password,
+          // optional: Tell NextAuth where you'd like to go after sign-in
+          callbackUrl: "/main/dashboard",
+        });
+
+        console.log("login user data:", loginUser);
+
+        if (!loginUser) {
+          // If signIn returns undefined, it likely redirected (provider id mismatch)
+          toaster.create({
+            title: "Sign in error",
+            description:
+              "An unexpected authentication flow occurred. Check provider ID.",
+            type: "error",
+            duration: 3000,
+          });
+          // Choose an appropriate fallback (stay on signup or go to sign-in page)
+          router.replace("/auth/login");
+          return;
+        }
+
+        // NextAuth signIn returns an object like { error, status, ok, url } when redirect:false
+
+        if (loginUser?.error) {
+          // If signIn responded with an error like wrong credentials
+
+          toaster.create({
+            title: "Login Error",
+            description: "Error logging in. Please try again.",
+            type: "error",
+            duration: 3000,
+          });
+
+          // Optionally send back to signup or keep user on signup
+          router.replace("/auth/signup");
+          return;
+        }
+
+        // success: navigate to dashboard (use `url` or your callback)
+        if (loginUser?.ok) {
+          // If loginUser.url exists, you can use it. Otherwise use the callbackUrl you set.
+          router.replace(loginUser.url || "/main/dashboard");
+          return;
         }
       } catch (error) {
         const message =
@@ -74,7 +130,7 @@ const SignupForm = () => {
             title: "Unable to create account",
             description: message,
             type: "error",
-            duration: 5000,
+            duration: 3000,
           });
         }
       }
@@ -99,6 +155,7 @@ const SignupForm = () => {
         <form onSubmit={formik.handleSubmit} noValidate>
           <Stack gap={5}>
             <Flex direction={{ base: "column", md: "row" }} gap={4}>
+              {/* first name input  */}
               <Field.Root flex="1">
                 <Field.Label color="whiteAlpha.800">First name</Field.Label>
                 <Input
@@ -122,11 +179,12 @@ const SignupForm = () => {
                   </Text>
                 )}
               </Field.Root>
+              {/* last name input  */}
               <Field.Root flex="1">
                 <Field.Label color="whiteAlpha.800">Last name</Field.Label>
                 <Input
                   name="lastName"
-                  placeholder="Doe"
+                  placeholder="Dane"
                   value={formik.values.lastName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -146,6 +204,7 @@ const SignupForm = () => {
                 )}
               </Field.Root>
             </Flex>
+            {/* email address input  */}
             <Field.Root>
               <Field.Label color="whiteAlpha.800">Email address</Field.Label>
               <Input
@@ -170,6 +229,32 @@ const SignupForm = () => {
                 </Text>
               )}
             </Field.Root>
+            {/* city input  */}
+            <Field.Root>
+              <Field.Label color="whiteAlpha.800">City</Field.Label>
+              <Input
+                name="city"
+                type="text"
+                placeholder="Your city name"
+                value={formik.values.city}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                bg="rgba(40, 40, 40, 0.9)"
+                borderColor="transparent"
+                color="white"
+                _placeholder={{ color: "whiteAlpha.600" }}
+                _focusVisible={{
+                  borderColor: "red.500",
+                  boxShadow: "0 0 0 1px rgba(229, 9, 20, 0.8)",
+                }}
+              />
+              {formik.touched.city && formik.errors.city && (
+                <Text color="red.400" fontSize="sm" mt={1}>
+                  {formik.errors.city}
+                </Text>
+              )}
+            </Field.Root>
+            {/* password input  */}
             <Field.Root>
               <Field.Label color="whiteAlpha.800">Password</Field.Label>
               <PasswordInput
@@ -193,6 +278,7 @@ const SignupForm = () => {
                 </Text>
               )}
             </Field.Root>
+            {/* create account button  */}
             <Grid>
               <Button
                 type="submit"

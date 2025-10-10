@@ -1,27 +1,57 @@
 "use client";
 
 import React from "react";
-
-import { Flex, Input, Button, Field, Text } from "@chakra-ui/react";
-
+import {
+  Flex,
+  Input,
+  Button,
+  Field,
+  Text,
+  SimpleGrid,
+  Center,
+  Spinner,
+} from "@chakra-ui/react";
+import type {
+  Movie,
+  FavoriteMovie,
+  SearchMoviesResponse,
+  FavoritesResponse,
+} from "@/types/movie";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { SEARCH_MOVIE, FETCH_ALL_FAVORITES } from "@/lib/graphql";
+import MovieCard from "@/components/MovieCard";
 
 // input styles
 const inputStyles = {
-  w: "full",
+  w: "3/5",
   minW: "sm",
-  bg: "rgba(32, 32, 32, 0.9)",
+  paddingY: "4px",
+  bg: "blackAlpha.800",
   borderColor: "transparent",
-  color: "text-primary",
+  color: "white",
   _placeholder: { color: "whiteAlpha.600" },
   _focusVisible: {
-    borderColor: "brand-red",
-    boxShadow: "0 0 0 1px rgba(229, 9, 20, 0.6)",
+    borderColor: "blue.500",
+    boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)",
   },
 };
 
 const SearchMovie = () => {
+  const [searchMovies, { data: searchData, loading: searchLoading }] =
+    useLazyQuery<SearchMoviesResponse>(SEARCH_MOVIE);
+  const { data: favoritesData } =
+    useQuery<FavoritesResponse>(FETCH_ALL_FAVORITES);
+
+  const favoriteMovieIds = React.useMemo(() => {
+    return (
+      favoritesData?.getFavoriteMovies?.map(
+        (fav: FavoriteMovie) => fav.movie.externalId,
+      ) || []
+    );
+  }, [favoritesData]);
+
   // initial form values
   const initialValues = {
     search: "",
@@ -41,14 +71,12 @@ const SearchMovie = () => {
     validateOnBlur: false,
     onSubmit: async (values, helpers) => {
       try {
-        // handle search logic here
-        console.log("Searching for movie:", values.search);
-
         const query = values.search.trim();
-
         if (!query) return;
-        console.log("Searching for movie:", query);
-        // search movie API call for search
+
+        await searchMovies({
+          variables: { query },
+        });
       } catch (error) {
         console.error("Search failed:", error);
       } finally {
@@ -68,7 +96,7 @@ const SearchMovie = () => {
   return (
     <>
       <form onSubmit={formik.handleSubmit} noValidate>
-        <Flex>
+        <Flex align="center" mb={6}>
           <Field.Root>
             <Input
               name="search"
@@ -84,22 +112,49 @@ const SearchMovie = () => {
 
           <Button
             type="submit"
+            // colorScheme="red"
+            marginLeft=".5rem"
             colorPalette="red"
             size="lg"
-            marginLeft=".5rem"
-            fontWeight="semi-bold"
-            loading={formik.isSubmitting}
+            fontWeight="semibold"
             disabled={formik.isSubmitting || !formik.values.search.trim()}
           >
-            Search
+            {formik.isSubmitting || searchLoading ? "Searching..." : "Search"}
           </Button>
         </Flex>
         {showError && (
-          <Text color="brand-red-dark" mt={2} fontSize="sm">
+          <Text color="red.500" mt={2} fontSize="sm">
             {formik.errors.search}
           </Text>
         )}
       </form>
+
+      {searchLoading && (
+        <Center py={10}>
+          <Spinner size="xl" />
+        </Center>
+      )}
+
+      {searchData?.searchMovies?.movies && (
+        <Center>
+          <SimpleGrid
+            columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
+            gap={4}
+            maxW="1400px"
+            w="full"
+            justifyContent="center"
+            px={{ base: 2, md: 4 }}
+          >
+            {searchData.searchMovies.movies.map((movie: Movie) => (
+              <MovieCard
+                key={movie.externalId}
+                movie={movie}
+                isFavorite={favoriteMovieIds.includes(movie.externalId)}
+              />
+            ))}
+          </SimpleGrid>
+        </Center>
+      )}
     </>
   );
 };

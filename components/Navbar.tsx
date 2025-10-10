@@ -5,7 +5,6 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Avatar,
-  AvatarIcon,
   Box,
   Button,
   Flex,
@@ -34,12 +33,14 @@ type SessionUser = {
   city?: string | null;
 };
 
+// display full name
 function getDisplayName(user: SessionUser) {
   const { firstName, lastName, email } = user;
   const name = [firstName, lastName].filter(Boolean).join(" ").trim();
   return name.length > 0 ? name : (email ?? "My Account");
 }
 
+// Profile Menu function
 function ProfileMenu({ user }: { user: SessionUser }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -54,11 +55,24 @@ function ProfileMenu({ user }: { user: SessionUser }) {
 
   const handleSignOut = React.useCallback(() => {
     setIsOpen(false);
+
+    //  The void keyword just tells TypeScript:
+    // “Ignore the promise returned by signOut(), we don’t need to await it.”
     void signOut({ callbackUrl: "/auth/login" });
   }, []);
 
   const displayName = React.useMemo(() => getDisplayName(user), [user]);
   const displayEmail = user.email ?? "";
+
+  // Display initials of your names
+  // This useMemo() ensures that when your async user data (like from a session or API) updates, the initials recompute
+  const displayInitial = React.useMemo(
+    () =>
+      `${user?.firstName || "first name"} ${user?.lastName || "last name"}`
+        .trim()
+        .toUpperCase(),
+    [user?.firstName, user?.lastName],
+  );
 
   return (
     <Menu.Root
@@ -94,25 +108,17 @@ function ProfileMenu({ user }: { user: SessionUser }) {
             boxShadow: "0 0 0 2px rgba(229, 9, 20, 0.5)",
           }}
         >
-          <Avatar.Root
-            size="sm"
-            // name={displayName}
-            // src={user.image ?? undefined}
-            bg="brand-red-dark"
-            color="white"
-          >
-            <AvatarIcon
-              boxSize="0.75rem"
-              bg="green.400"
-              borderColor="rgba(0,0,0,0.85)"
-            />
+          <Avatar.Root size="lg" bg="brand-red-dark" color="white">
+            <Avatar.Fallback name={displayInitial} />
           </Avatar.Root>
         </chakra.button>
       </Menu.Trigger>
+
+      {/* portal menu popover */}
       <Portal>
         <Menu.Positioner zIndex="popover">
           <Menu.Content
-            divideX="1px"
+            divideY="1px"
             w="18rem"
             borderRadius="xl"
             overflow="hidden"
@@ -124,18 +130,8 @@ function ProfileMenu({ user }: { user: SessionUser }) {
             color="whiteAlpha.900"
           >
             <Stack align="center" gap={3} px={6} pt={6} pb={5}>
-              <Avatar.Root
-                size="lg"
-                // name={displayName}
-                // src={user.image ?? undefined}
-                bg="brand-red"
-                color="white"
-              >
-                <AvatarIcon
-                  boxSize="0.85rem"
-                  bg="green.400"
-                  borderColor="rgba(18, 18, 18, 0.92)"
-                />
+              <Avatar.Root size="lg" bg="brand-red" color="white">
+                <Avatar.Fallback name={displayInitial} />
               </Avatar.Root>
               <Stack align="center" gap={1}>
                 <Text fontWeight="semibold" fontSize="lg">
@@ -148,7 +144,7 @@ function ProfileMenu({ user }: { user: SessionUser }) {
                 ) : null}
               </Stack>
             </Stack>
-            {/* <Divider borderColor="whiteAlpha.200" /> */}
+
             <Stack py={2} gap={1}>
               <Menu.Item
                 value="profile"
@@ -161,7 +157,7 @@ function ProfileMenu({ user }: { user: SessionUser }) {
               >
                 <Text fontWeight="medium">Manage Profile</Text>
               </Menu.Item>
-              {/* <Divider borderColor="whiteAlpha.200" mx={6} /> */}
+
               <Menu.Item
                 value="signout"
                 px={6}
@@ -207,87 +203,95 @@ export default function Navbar() {
       backdropFilter="blur(18px)"
       boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)"
     >
-      <Flex
-        h="4.5rem"
-        align="center"
-        justify="space-between"
-        px={{ base: 4, md: 8, lg: 12 }}
-        color="white"
-      >
-        <HStack gap={{ base: 4, md: 8 }} align="center" flex="1">
-          <Link
-            as={NextLink}
-            href="/main/dashboard"
-            _hover={{ textDecor: "none", color: "brand-red" }}
-          >
-            <Text
-              fontSize={{ base: "25px", md: "30px", lg: "40px" }}
-              color="brand-red-dark"
-              as="span"
-              textTransform="uppercase"
-              fontFamily="'Bebas Neue','Anton',Impact,'Arial Black',sans-serif"
-              fontWeight="900"
-              lineHeight="0.9"
-              letterSpacing="-0.04em"
-            >
-              MovieWeather
-            </Text>
-          </Link>
-          <HStack
-            as="nav"
-            gap={5}
-            display={{ base: "none", md: "flex" }}
-            fontSize="sm"
-            fontWeight="medium"
-            color="whiteAlpha.800"
-          >
-            {NavbarMenuItems.map((item) => (
-              <Link
-                as={NextLink}
-                key={item.href}
-                _hover={{ textDecor: "none", color: "red.300" }}
-                href={item.href}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </HStack>
-        </HStack>
-
-        <HStack gap={3} justify="flex-end">
-          {user ? (
-            <ProfileMenu user={user} />
-          ) : (
-            <Link as={NextLink} href="/auth/login">
-              <Button colorPalette="red" size="sm">
-                Sign in
-              </Button>
-            </Link>
-          )}
-          <IconButton
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-            aria-expanded={isOpen}
-            aria-controls="mobile-nav"
-            onClick={toggleMobileMenu}
-            display={{ base: "inline-flex", md: "none" }}
-            variant="ghost"
+      <Flex w="full" justify="center">
+        <Box w="75%" maxW="1400px">
+          <Flex
+            h="4.5rem"
+            align="center"
+            justify="space-between"
             color="white"
-            // icon=
-            rounded="full"
-            borderWidth="1px"
-            borderColor={isOpen ? "brand-red" : "transparent"}
-            bg={isOpen ? "rgba(229, 9, 20, 0.12)" : "transparent"}
-            _hover={{
-              bg: "rgba(255, 255, 255, 0.08)",
-              backdropFilter: "blur(16px)",
-            }}
-            _active={{
-              bg: "rgba(229, 9, 20, 0.18)",
-            }}
+            px={{ base: 4, md: 6, lg: 8 }}
           >
-            {isOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-          </IconButton>
-        </HStack>
+            {/* logo area */}
+            <Link
+              as={NextLink}
+              href="/main/dashboard"
+              _hover={{ textDecor: "none", color: "brand-red" }}
+            >
+              <Text
+                fontSize={{ base: "25px", md: "30px", lg: "40px" }}
+                color="brand-red-dark"
+                as="span"
+                textTransform="uppercase"
+                fontFamily="'Bebas Neue','Anton',Impact,'Arial Black',sans-serif"
+                fontWeight="900"
+                lineHeight="0.9"
+                letterSpacing="-0.04em"
+              >
+                MovieWeather
+              </Text>
+            </Link>
+            {/* menu links  */}
+            <HStack gap={{ base: 4, md: 8 }} align="center" flex="1">
+              <HStack
+                as="nav"
+                gap={8}
+                display={{ base: "none", md: "flex" }}
+                // fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                color="whiteAlpha.800"
+                position="absolute"
+                align={{ md: "center" }}
+                // left="50%"
+                // transform="translateX(-50%)"
+              >
+                {NavbarMenuItems.map((item) => (
+                  <Link
+                    as={NextLink}
+                    key={item.href}
+                    _hover={{ textDecor: "none", color: "red.300" }}
+                    href={item.href}
+                    fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </HStack>
+            </HStack>
+            <HStack gap={3} justify="flex-end">
+              {user ? (
+                <ProfileMenu user={user} />
+              ) : (
+                <Link as={NextLink} href="/auth/login">
+                  <Button colorPalette="red" size="sm">
+                    Sign in
+                  </Button>
+                </Link>
+              )}
+              <IconButton
+                aria-label={isOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isOpen}
+                aria-controls="mobile-nav"
+                onClick={toggleMobileMenu}
+                display={{ base: "inline-flex", md: "none" }}
+                variant="ghost"
+                color="white"
+                rounded="full"
+                borderWidth="1px"
+                borderColor={isOpen ? "brand-red" : "transparent"}
+                bg={isOpen ? "rgba(229, 9, 20, 0.12)" : "transparent"}
+                _hover={{
+                  bg: "rgba(255, 255, 255, 0.08)",
+                  backdropFilter: "blur(16px)",
+                }}
+                _active={{
+                  bg: "rgba(229, 9, 20, 0.18)",
+                }}
+              >
+                {isOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+              </IconButton>
+            </HStack>
+          </Flex>
+        </Box>
       </Flex>
 
       {isOpen ? (
@@ -342,8 +346,7 @@ export default function Navbar() {
                 </Stack>
 
                 {user ? (
-                  <Stack gap={4} divideX="1px">
-                    {/* <Divider borderColor="whiteAlpha.200" /> */}
+                  <Stack gap={4}>
                     <Button
                       justifyContent="flex-start"
                       variant="ghost"

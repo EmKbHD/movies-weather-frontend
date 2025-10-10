@@ -6,15 +6,19 @@ import { SessionProvider } from "next-auth/react";
 import { client } from "@/lib/apollo";
 import { system } from "../theme/theme";
 import { ColorModeProvider, type ColorModeProviderProps } from "./color-mode";
+import { Toaster } from "./toaster";
 
 export default function Provider(props: ColorModeProviderProps) {
   return (
-    <ApolloProvider client={client}>
-      <SessionProvider>
+    <SessionProvider>
+      <ApolloProvider client={client}>
         <ChakraProvider value={system}>
-          <ColorModeProvider {...props} />
+          <ColorModeProvider {...props}>
+            <Toaster />
+            {props.children}
+          </ColorModeProvider>
         </ChakraProvider>
-      </SessionProvider>
-    </ApolloProvider>
+      </ApolloProvider>
+    </SessionProvider>
   );
 }
