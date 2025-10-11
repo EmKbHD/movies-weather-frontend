@@ -147,6 +147,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
           alt="Weather icon"
           boxSize="100px"
           filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))"
+          animation="bounce"
         />
 
         <Text

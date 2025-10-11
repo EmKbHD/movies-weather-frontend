@@ -20,18 +20,18 @@ import {
 import { FiMenu, FiX } from "react-icons/fi";
 import { signOut, useSession } from "next-auth/react";
 
-const NavbarMenuItems = [
-  { label: "Dashboard", href: "/main/dashboard" },
-  { label: "Movies", href: "/main/movies" },
-  { label: "Favorites", href: "/main/favorites" },
-];
-
 type SessionUser = {
   firstName?: string | null;
   lastName?: string | null;
   email?: string | null;
   city?: string | null;
 };
+
+const NavbarMenuItems = [
+  { label: "Dashboard", href: "/main/dashboard" },
+  { label: "Movies", href: "/main/movies" },
+  { label: "Favorites", href: "/main/favorites" },
+];
 
 // display full name
 function getDisplayName(user: SessionUser) {
@@ -181,6 +181,9 @@ function ProfileMenu({ user }: { user: SessionUser }) {
 export default function Navbar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
+  const [activeLink, setActiveLink] = React.useState<string>(
+    NavbarMenuItems[0].href,
+  );
 
   const { data } = useSession();
   const user = data?.user as SessionUser | undefined;
@@ -204,94 +207,107 @@ export default function Navbar() {
       boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)"
     >
       <Flex w="full" justify="center">
-        <Box w="75%" maxW="1400px">
-          <Flex
-            h="4.5rem"
-            align="center"
-            justify="space-between"
-            color="white"
-            px={{ base: 4, md: 6, lg: 8 }}
+        <Flex
+          w="75%"
+          maxW="1440px"
+          h="4.5rem"
+          align="center"
+          justify="space-between"
+          color="white"
+          px={{ base: 4, md: 6, lg: 8 }}
+        >
+          {/* logo area */}
+          <Link
+            as={NextLink}
+            href="/main/dashboard"
+            _hover={{ textDecor: "none", color: "brand-red" }}
+            onClick={() => setActiveLink(NavbarMenuItems[0].href)}
           >
-            {/* logo area */}
-            <Link
-              as={NextLink}
-              href="/main/dashboard"
-              _hover={{ textDecor: "none", color: "brand-red" }}
+            <Text
+              fontSize={{ base: "25px", md: "30px", lg: "40px" }}
+              color="brand-red-dark"
+              as="span"
+              textTransform="uppercase"
+              fontFamily="'Bebas Neue','Anton',Impact,'Arial Black',sans-serif"
+              fontWeight="900"
+              lineHeight="0.9"
+              letterSpacing="-0.04em"
             >
-              <Text
-                fontSize={{ base: "25px", md: "30px", lg: "40px" }}
-                color="brand-red-dark"
-                as="span"
-                textTransform="uppercase"
-                fontFamily="'Bebas Neue','Anton',Impact,'Arial Black',sans-serif"
-                fontWeight="900"
-                lineHeight="0.9"
-                letterSpacing="-0.04em"
-              >
-                MovieWeather
-              </Text>
-            </Link>
-            {/* menu links  */}
-            <HStack gap={{ base: 4, md: 8 }} align="center" flex="1">
-              <HStack
-                as="nav"
-                gap={8}
-                display={{ base: "none", md: "flex" }}
-                // fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                color="whiteAlpha.800"
-                position="absolute"
-                align={{ md: "center" }}
-                // left="50%"
-                // transform="translateX(-50%)"
-              >
-                {NavbarMenuItems.map((item) => (
+              MovieWeather
+            </Text>
+          </Link>
+          {/* menu links  */}
+          <HStack
+            w="full"
+            h="4rem"
+            gap={{ base: 2, md: 8 }}
+            align="center"
+            justify="center"
+          >
+            <HStack
+              as="nav"
+              gap={8}
+              display={{ base: "none", md: "flex" }}
+              color="whiteAlpha.800"
+              position="absolute"
+            >
+              {NavbarMenuItems.map((item) => {
+                const isActive = activeLink === item.href;
+                return (
                   <Link
                     as={NextLink}
                     key={item.href}
-                    _hover={{ textDecor: "none", color: "red.300" }}
                     href={item.href}
+                    fontWeight={isActive ? "semibold" : "medium"}
+                    color={isActive ? "white" : "whiteAlpha.700"}
                     fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                    _hover={{ textDecor: "none", color: "red.300" }}
+                    _active={{
+                      bg: "rgba(229, 9, 20, 0.18)",
+                    }}
+                    onClick={() => setActiveLink(item.href)}
                   >
                     {item.label}
                   </Link>
-                ))}
-              </HStack>
+                );
+              })}
             </HStack>
-            <HStack gap={3} justify="flex-end">
-              {user ? (
-                <ProfileMenu user={user} />
-              ) : (
-                <Link as={NextLink} href="/auth/login">
-                  <Button colorPalette="red" size="sm">
-                    Sign in
-                  </Button>
-                </Link>
-              )}
-              <IconButton
-                aria-label={isOpen ? "Close menu" : "Open menu"}
-                aria-expanded={isOpen}
-                aria-controls="mobile-nav"
-                onClick={toggleMobileMenu}
-                display={{ base: "inline-flex", md: "none" }}
-                variant="ghost"
-                color="white"
-                rounded="full"
-                borderWidth="1px"
-                borderColor={isOpen ? "brand-red" : "transparent"}
-                bg={isOpen ? "rgba(229, 9, 20, 0.12)" : "transparent"}
-                _hover={{
-                  bg: "rgba(255, 255, 255, 0.08)",
-                  backdropFilter: "blur(16px)",
-                }}
-                _active={{
-                  bg: "rgba(229, 9, 20, 0.18)",
-                }}
-              >
-                {isOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-              </IconButton>
-            </HStack>
-          </Flex>
-        </Box>
+          </HStack>
+          <HStack gap={3} justify="flex-end">
+            {user ? (
+              <ProfileMenu user={user} />
+            ) : (
+              <Link as={NextLink} href="/auth/login">
+                <Button colorPalette="red" size="sm">
+                  Sign in
+                </Button>
+              </Link>
+            )}
+            {/* hamburger and close buttons */}
+            <IconButton
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+              aria-controls="mobile-nav"
+              onClick={toggleMobileMenu}
+              display={{ base: "inline-flex", md: "none" }}
+              variant="ghost"
+              color="white"
+              rounded="full"
+              borderWidth="1px"
+              borderColor={isOpen ? "brand-red" : "transparent"}
+              bg={isOpen ? "rgba(229, 9, 20, 0.12)" : "transparent"}
+              _hover={{
+                bg: "rgba(255, 255, 255, 0.08)",
+                backdropFilter: "blur(16px)",
+              }}
+              _active={{
+                bg: "rgba(229, 9, 20, 0.18)",
+              }}
+            >
+              {isOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+            </IconButton>
+          </HStack>
+        </Flex>
       </Flex>
 
       {isOpen ? (

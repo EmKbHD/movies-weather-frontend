@@ -8,6 +8,10 @@ export const system = createSystem(defaultConfig, {
         from: { transform: "rotate(0deg)" },
         to: { transform: "rotate(360deg)" },
       },
+      bounce: {
+        "0%, 100%": { transform: "translateY(0)" },
+        "50%": { transform: "translateY(-4px)" },
+      },
     },
     tokens: {
       cursor: {
@@ -43,6 +47,7 @@ export const system = createSystem(defaultConfig, {
       animations: {
         // name it "spin" so you can use animation="spin"
         spin: { value: "spin 1s linear infinite" },
+        bounce: { value: "bounce 1.5s ease-in-out infinite" },
       },
     },
     breakpoints: {

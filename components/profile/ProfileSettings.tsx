@@ -87,7 +87,7 @@ export default function ProfileSettings() {
             })}
           </Stack>
         </Box>
-        {/* change password */}
+        {/* initial general box state */}
         <Box flex={1} width="full">
           {activeSection === "edit-profile" ? (
             <EditProfileForm />
