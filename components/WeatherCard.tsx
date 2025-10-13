@@ -68,11 +68,11 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
         fetchPolicy: "network-only",
       });
 
-      const fresh = res?.data?.getCurrentWeather;
-      if (fresh) {
-        setTemperature(fresh.temperature);
-        setIcon(fresh.icon);
-        setTimestamp(fresh.timestamp);
+      const refresh = res?.data?.getCurrentWeather;
+      if (refresh) {
+        setTemperature(refresh.temperature);
+        setIcon(refresh.icon);
+        setTimestamp(refresh.timestamp);
       }
     } catch (err) {
       console.error("Error refreshing weather:", err);
@@ -110,7 +110,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
 
   return (
     <Box
-      width="70%"
+      width={{ base: "100%", sm: "80%", lg: "70%" }}
       p={6}
       bg={glassBackground}
       borderRadius="xl"

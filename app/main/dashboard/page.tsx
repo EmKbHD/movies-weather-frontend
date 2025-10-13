@@ -21,7 +21,7 @@ export default function DashboardPage() {
         )}
 
         <VStack align="stretch" gap={2}>
-          <Text fontSize="2xl" fontWeight="bold">
+          <Text fontSize={["sm", "lg", "2xl"]} fontWeight="bold">
             Your Favorite Movies
           </Text>
           <FavoritesList />

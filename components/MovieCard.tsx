@@ -70,13 +70,14 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, isFavorite = false }) => {
     <Box
       maxW="280px"
       w="full"
+      h="full"
       borderRadius="md"
       overflow="hidden"
       bg={bgColor}
       boxShadow="sm"
       display="flex"
       flexDirection="column"
-      transition="transform 0.2s"
+      transition="transform 0.3s"
       _hover={{ transform: "scale(1.02)" }}
     >
       <Box position="relative" paddingTop="140%">

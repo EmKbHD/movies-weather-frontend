@@ -258,7 +258,7 @@ export default function Navbar() {
                     as={NextLink}
                     key={item.href}
                     href={item.href}
-                    fontWeight={isActive ? "semibold" : "medium"}
+                    fontWeight={isActive ? "semibold" : ""}
                     color={isActive ? "white" : "whiteAlpha.700"}
                     fontSize={{ base: "sm", md: "md", lg: "lg" }}
                     _hover={{ textDecor: "none", color: "red.300" }}

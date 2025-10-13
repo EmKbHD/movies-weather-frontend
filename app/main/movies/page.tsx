@@ -9,7 +9,11 @@ export default function MoviePage() {
       <VStack gap={8} align="center">
         <VStack align="center" gap={3}>
           <Heading size="2xl">Movie Search</Heading>
-          <Text color="gray.500" fontSize="lg" textAlign="center">
+          <Text
+            color="gray.400"
+            fontSize={["sm", "lg", "xl"]}
+            textAlign="center"
+          >
             Search and discover your favorite movies
           </Text>
         </VStack>

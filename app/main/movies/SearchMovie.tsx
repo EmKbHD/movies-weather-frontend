@@ -25,8 +25,6 @@ import MovieCard from "@/components/MovieCard";
 
 // input styles
 const inputStyles = {
-  w: "3/5",
-  minW: "sm",
   paddingY: "4px",
   bg: "blackAlpha.800",
   borderColor: "transparent",
@@ -96,27 +94,37 @@ const SearchMovie = () => {
   return (
     <>
       <form onSubmit={formik.handleSubmit} noValidate>
-        <Flex align="center" mb={6}>
-          <Field.Root>
+        <Flex
+          flexDir={{ base: "column", sm: "row" }}
+          w="full"
+          maxW="992px"
+          align="center"
+          mb={6}
+          px={{ base: 1, sm: 1, md: 0 }}
+        >
+          <Field.Root flex="1">
             <Input
+              {...inputStyles}
               name="search"
               type="text"
               size="lg"
+              w={{ base: "100%", sm: "100%", md: "lg" }}
               placeholder="Search for a movie..."
               value={formik.values.search}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              {...inputStyles}
             />
           </Field.Root>
 
           <Button
             type="submit"
-            // colorScheme="red"
             marginLeft=".5rem"
             colorPalette="red"
             size="lg"
             fontWeight="semibold"
+            mt={{ base: 2, sm: 0 }} // add margin on mobile
+            ml={{ base: 0, sm: 2 }} // margin-left on larger screens
+            w={{ base: "60%", sm: "auto" }} // full width on small screens
             disabled={formik.isSubmitting || !formik.values.search.trim()}
           >
             {formik.isSubmitting || searchLoading ? "Searching..." : "Search"}
@@ -136,24 +144,23 @@ const SearchMovie = () => {
       )}
 
       {searchData?.searchMovies?.movies && (
-        <Center>
-          <SimpleGrid
-            columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
-            gap={4}
-            maxW="1400px"
-            w="full"
-            justifyContent="center"
-            px={{ base: 2, md: 4 }}
-          >
-            {searchData.searchMovies.movies.map((movie: Movie) => (
-              <MovieCard
-                key={movie.externalId}
-                movie={movie}
-                isFavorite={favoriteMovieIds.includes(movie.externalId)}
-              />
-            ))}
-          </SimpleGrid>
-        </Center>
+        <SimpleGrid
+          columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5, "2xl": 6 }}
+          gap={2}
+          mx="auto"
+          w="full"
+          placeItems="center"
+          alignItems="stretch"
+          p={{ base: 2, md: 4 }}
+        >
+          {searchData.searchMovies.movies.map((movie: Movie) => (
+            <MovieCard
+              key={movie.externalId}
+              movie={movie}
+              isFavorite={favoriteMovieIds.includes(movie.externalId)}
+            />
+          ))}
+        </SimpleGrid>
       )}
     </>
   );
