@@ -110,7 +110,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
 
   return (
     <Box
-      width={{ base: "100%", sm: "80%", lg: "70%" }}
+      width={{ base: "100%", md: "80%", lg: "70%" }}
       p={6}
       bg={glassBackground}
       borderRadius="xl"
@@ -180,6 +180,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
             color={textColor}
             onClick={refreshLastUpdate}
             disabled={refreshing}
+            _hover={{ bg: "none" }}
           >
             {refreshing ? (
               <Icon as={ImSpinner} boxSize="18px" animation="spin" />

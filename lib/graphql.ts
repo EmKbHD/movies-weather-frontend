@@ -1,6 +1,10 @@
 import { gql } from "@apollo/client";
 
-// GraphQL QUERY for user login
+/**
+ * ------------------- QUERIES START HERE -----------------------
+ */
+
+// LOGIN QUERY
 
 export const GET_USER = gql`
   query getUser {
@@ -13,7 +17,7 @@ export const GET_USER = gql`
   }
 `;
 
-// Get city weather
+// GET USER CITY WEATHER
 
 export const GET_CITY_WEATHER = gql`
   query GetCurrentWeather($city: String!) {
@@ -26,7 +30,7 @@ export const GET_CITY_WEATHER = gql`
   }
 `;
 
-// Get All Favorites Movies
+// GET ALL USER MOVIES
 
 export const FETCH_ALL_FAVORITES = gql`
   query myFavorites {
@@ -43,7 +47,7 @@ export const FETCH_ALL_FAVORITES = gql`
   }
 `;
 
-// Search a Movie
+// SEARCH A MOVIE
 
 export const SEARCH_MOVIE = gql`
   query SearchMovies($query: String!) {
@@ -57,6 +61,51 @@ export const SEARCH_MOVIE = gql`
         externalId
       }
       totalResults
+    }
+  }
+`;
+
+/**
+ *  --------- MUTATIONS START HERE ---------------
+ */
+
+// SIGNUP MUTATION
+
+export const SIGNUP_USER = gql`
+  mutation Signup($input: SignUpInput!) {
+    signup(input: $input) {
+      user {
+        firstName
+        lastName
+        city
+        email
+      }
+      token
+    }
+  }
+`;
+
+// UPDATE USER PROFILE
+
+export const UPDATE_USER_PROFILE = gql`
+  mutation UpdateProfile($input: UpdateProfileInput!) {
+    updateProfile(input: $input) {
+      id
+      firstName
+      lastName
+      email
+      city
+    }
+  }
+`;
+
+// UPDATE USER PASSWORD
+
+export const UPDATE_USER_PASSWORD = gql`
+  mutation UpdatePassword($input: UpdatePasswordInput!) {
+    updatePassword(input: $input) {
+      success
+      message
     }
   }
 `;
@@ -84,22 +133,6 @@ export const ADD_TO_FAVORITE = gql`
 export const REMOVE_FAVORITE = gql`
   mutation RemoveFavorite($externalId: String!) {
     removeFavoriteMovie(externalId: $externalId)
-  }
-`;
-
-// SIGNUP MUTATION
-
-export const SIGNUP_USER = gql`
-  mutation Signup($input: SignUpInput!) {
-    signup(input: $input) {
-      user {
-        firstName
-        lastName
-        city
-        email
-      }
-      token
-    }
   }
 `;
 

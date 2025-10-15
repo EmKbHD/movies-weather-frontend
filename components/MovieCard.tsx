@@ -71,7 +71,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, isFavorite = false }) => {
       maxW="280px"
       w="full"
       h="full"
-      borderRadius="md"
+      borderRadius="xl"
       overflow="hidden"
       bg={bgColor}
       boxShadow="sm"

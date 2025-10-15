@@ -205,10 +205,13 @@ export default function Navbar() {
       bg="rgba(10, 10, 10, 0.85)"
       backdropFilter="blur(18px)"
       boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)"
+      w={{ base: "95%", md: "full" }}
+      borderRadius={{ base: "xl", md: "none" }}
+      mx="auto"
     >
       <Flex w="full" justify="center">
         <Flex
-          w="75%"
+          w={{ base: "90%", md: "75%" }}
           maxW="1440px"
           h="4.5rem"
           align="center"

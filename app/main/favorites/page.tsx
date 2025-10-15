@@ -7,7 +7,9 @@ export default function FavoritesPage() {
   return (
     <Container maxW="container.xl" py={8}>
       <Box mb={6}>
-        <Heading fontSize={["sm", "lg", "2xl"]}>My Favorite Movies</Heading>
+        <Heading fontSize={["sm", "md", "lg", "2xl"]}>
+          My Favorite Movies
+        </Heading>
       </Box>
       <FavoritesList />
     </Container>
