@@ -4,179 +4,30 @@ import * as React from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Avatar,
   Box,
   Button,
   Flex,
   HStack,
   IconButton,
   Link,
-  Menu,
-  Portal,
   Stack,
   Text,
-  chakra,
 } from "@chakra-ui/react";
 import { FiMenu, FiX } from "react-icons/fi";
-import { signOut, useSession } from "next-auth/react";
 
-type SessionUser = {
-  firstName?: string | null;
-  lastName?: string | null;
-  email?: string | null;
-  city?: string | null;
-};
+import ProfileMenu from "./profile/ProfileMenu";
+
+import { signOut } from "next-auth/react";
+
+import type { User } from "next-auth";
+import { GET_USER } from "@/lib/graphql";
+import { useQuery } from "@apollo/client";
 
 const NavbarMenuItems = [
   { label: "Dashboard", href: "/main/dashboard" },
   { label: "Movies", href: "/main/movies" },
   { label: "Favorites", href: "/main/favorites" },
 ];
-
-// display full name
-function getDisplayName(user: SessionUser) {
-  const { firstName, lastName, email } = user;
-  const name = [firstName, lastName].filter(Boolean).join(" ").trim();
-  return name.length > 0 ? name : (email ?? "My Account");
-}
-
-// Profile Menu function
-function ProfileMenu({ user }: { user: SessionUser }) {
-  const router = useRouter();
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const handleNavigate = React.useCallback(
-    (path: string) => {
-      setIsOpen(false);
-      router.push(path);
-    },
-    [router],
-  );
-
-  const handleSignOut = React.useCallback(() => {
-    setIsOpen(false);
-
-    //  The void keyword just tells TypeScript:
-    // “Ignore the promise returned by signOut(), we don’t need to await it.”
-    void signOut({ callbackUrl: "/auth/login" });
-  }, []);
-
-  const displayName = React.useMemo(() => getDisplayName(user), [user]);
-  const displayEmail = user.email ?? "";
-
-  // Display initials of your names
-  // This useMemo() ensures that when your async user data (like from a session or API) updates, the initials recompute
-  const displayInitial = React.useMemo(
-    () =>
-      `${user?.firstName || "first name"} ${user?.lastName || "last name"}`
-        .trim()
-        .toUpperCase(),
-    [user?.firstName, user?.lastName],
-  );
-
-  return (
-    <Menu.Root
-      open={isOpen}
-      onOpenChange={({ open }) => setIsOpen(open)}
-      positioning={{ placement: "bottom-end", gutter: 12 }}
-    >
-      <Menu.Trigger asChild>
-        <chakra.button
-          type="button"
-          aria-label="Open profile menu"
-          rounded="full"
-          p="0.5"
-          bg="rgba(26, 26, 26, 0.8)"
-          borderWidth="1px"
-          borderColor={isOpen ? "brand-red" : "whiteAlpha.200"}
-          transition="all 0.2s ease"
-          display="inline-flex"
-          alignItems="center"
-          justifyContent="center"
-          boxShadow={
-            isOpen
-              ? "0 0 0 1px rgba(229, 9, 20, 0.4), 0 18px 40px rgba(0,0,0,0.4)"
-              : "0 12px 30px rgba(0,0,0,0.35)"
-          }
-          backdropFilter="blur(18px) saturate(140%)"
-          _hover={{
-            borderColor: "brand-red",
-            bg: "rgba(45, 45, 45, 0.85)",
-          }}
-          _focusVisible={{
-            outline: "none",
-            boxShadow: "0 0 0 2px rgba(229, 9, 20, 0.5)",
-          }}
-        >
-          <Avatar.Root size="lg" bg="brand-red-dark" color="white">
-            <Avatar.Fallback name={displayInitial} />
-          </Avatar.Root>
-        </chakra.button>
-      </Menu.Trigger>
-
-      {/* portal menu popover */}
-      <Portal>
-        <Menu.Positioner zIndex="popover">
-          <Menu.Content
-            divideY="1px"
-            w="18rem"
-            borderRadius="xl"
-            overflow="hidden"
-            borderWidth="1px"
-            borderColor="whiteAlpha.200"
-            bg="rgba(18, 18, 18, 0.92)"
-            backdropFilter="blur(22px) saturate(140%)"
-            boxShadow="0 25px 50px rgba(0, 0, 0, 0.55)"
-            color="whiteAlpha.900"
-          >
-            <Stack align="center" gap={3} px={6} pt={6} pb={5}>
-              <Avatar.Root size="lg" bg="brand-red" color="white">
-                <Avatar.Fallback name={displayInitial} />
-              </Avatar.Root>
-              <Stack align="center" gap={1}>
-                <Text fontWeight="semibold" fontSize="lg">
-                  {displayName}
-                </Text>
-                {displayEmail ? (
-                  <Text fontSize="sm" color="whiteAlpha.700">
-                    {displayEmail}
-                  </Text>
-                ) : null}
-              </Stack>
-            </Stack>
-
-            <Stack py={2} gap={1}>
-              <Menu.Item
-                value="profile"
-                px={6}
-                py={3}
-                cursor="pointer"
-                _hover={{ bg: "whiteAlpha.100" }}
-                _focus={{ bg: "whiteAlpha.100" }}
-                onClick={() => handleNavigate("/main/profile")}
-              >
-                <Text fontWeight="medium">Manage Profile</Text>
-              </Menu.Item>
-
-              <Menu.Item
-                value="signout"
-                px={6}
-                py={3}
-                cursor="pointer"
-                color="red.300"
-                _hover={{ bg: "rgba(229, 9, 20, 0.08)", color: "red.200" }}
-                _focus={{ bg: "rgba(229, 9, 20, 0.12)", color: "red.200" }}
-                onClick={handleSignOut}
-              >
-                <Text fontWeight="medium">Sign Out</Text>
-              </Menu.Item>
-            </Stack>
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu.Root>
-  );
-}
 
 export default function Navbar() {
   const router = useRouter();
@@ -185,8 +36,12 @@ export default function Navbar() {
     NavbarMenuItems[0].href,
   );
 
-  const { data } = useSession();
-  const user = data?.user as SessionUser | undefined;
+  const { data: userData } = useQuery(GET_USER, {
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
+  });
+
+  const user: User | undefined = userData?.me;
 
   const toggleMobileMenu = React.useCallback(() => {
     setIsOpen((prev) => !prev);

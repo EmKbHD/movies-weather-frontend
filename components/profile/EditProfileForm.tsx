@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useSession } from "next-auth/react";
+import type { User } from "next-auth";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -18,6 +18,9 @@ import {
   Input,
 } from "@chakra-ui/react";
 
+import { GET_USER, UPDATE_USER_PROFILE } from "@/lib/graphql";
+import { useMutation, useQuery } from "@apollo/client";
+
 // Define reusable field styles
 const fieldStyles = {
   bg: "rgba(32, 32, 32, 0.9)",
@@ -28,14 +31,6 @@ const fieldStyles = {
     borderColor: "brand-red",
     boxShadow: "0 0 0 1px rgba(229, 9, 20, 0.6)",
   },
-};
-
-// initial form values
-const initialValues = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  city: "",
 };
 
 // validation schema
@@ -49,26 +44,64 @@ const validationSchema = Yup.object({
 });
 
 export default function EditProfileForm() {
-  const { data } = useSession();
-  const user = data?.user;
+  // const { data: sessionData } = useSession();
+  const { data: userData } = useQuery(GET_USER, {
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
+  });
+
+  const user: User | undefined = userData?.me ?? undefined;
+
+  console.log("👤 User data:", user);
+
+  // initial form values
+  const initialValues = {
+    firstName: user?.firstName ?? "",
+    lastName: user?.lastName ?? "",
+    email: user?.email ?? "",
+    city: user?.city ?? "",
+  };
+
+  // Apollo mutation HOOK
+  const [updateProfile] = useMutation(UPDATE_USER_PROFILE);
 
   // formik hook for form state management
   const formik = useFormik({
     initialValues,
     validationSchema,
+    enableReinitialize: true,
 
     onSubmit: async (values, helpers) => {
       try {
-        // Simulate a network request
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        alert(JSON.stringify(values, null, 2));
+        // Build input for the mutation.
+        const input = {
+          firstName: values.firstName.trim(),
+          lastName: values.lastName.trim(),
+          email: values.email.trim(),
+          city: values.city.trim(),
+        };
 
-        toaster.create({
-          title: "Profile updated",
-          description: "Your profile has been successfully updated.",
-          type: "success",
-          duration: 5000,
+        // Execute the mutation
+        const result = await updateProfile({
+          variables: { input },
+
+          // Refetch a user query:
+          refetchQueries: [{ query: GET_USER }],
+          awaitRefetchQueries: true,
         });
+
+        const updated = result.data?.updateProfile;
+
+        if (updated) {
+          toaster.create({
+            title: "Profile updated",
+            description: "Your profile has been successfully updated.",
+            type: "success",
+            duration: 5000,
+          });
+        } else {
+          throw new Error("No data returned from update.");
+        }
       } catch (error) {
         console.error("❌ Failed to update profile", error);
 
@@ -84,14 +117,6 @@ export default function EditProfileForm() {
       }
     },
   });
-
-  // Generate preview name from first and last name
-  // const previewName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim();
-  const previewName = React.useMemo(
-    () =>
-      `${user?.firstName || "first name"} ${user?.lastName || "last name"}`.trim(),
-    [user?.firstName, user?.lastName],
-  );
 
   return (
     <Box
@@ -122,7 +147,9 @@ export default function EditProfileForm() {
               gap={6}
             >
               <Avatar.Root bg="brand-red" color="white" size="lg">
-                <Avatar.Fallback name={previewName} />
+                <Avatar.Fallback
+                  name={`${user?.firstName} ${user?.lastName}`}
+                />
               </Avatar.Root>
             </Flex>
           </Stack>
@@ -136,7 +163,7 @@ export default function EditProfileForm() {
                   <Field.Label color="whiteAlpha.800">First Name</Field.Label>
                   <Input
                     name="firstName"
-                    placeholder="First Name"
+                    placeholder={user?.firstName ?? "first name"}
                     value={formik.values.firstName}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
@@ -154,7 +181,7 @@ export default function EditProfileForm() {
                   <Field.Label color="whiteAlpha.800">Last Name</Field.Label>
                   <Input
                     name="lastName"
-                    placeholder="Last Name"
+                    placeholder={user?.lastName ?? "Last Name"}
                     value={formik.values.lastName}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
@@ -174,7 +201,7 @@ export default function EditProfileForm() {
                 <Input
                   name="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder={user?.email ?? "name@example.com"}
                   value={formik.values.email}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -192,7 +219,7 @@ export default function EditProfileForm() {
                 <Field.Label color="whiteAlpha.800">City</Field.Label>
                 <Input
                   name="city"
-                  placeholder="Your location"
+                  placeholder={user?.city ?? "Your location"}
                   value={formik.values.city}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
