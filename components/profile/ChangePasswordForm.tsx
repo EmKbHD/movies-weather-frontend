@@ -255,17 +255,6 @@ export default function ChangePasswordForm() {
               >
                 Update password
               </Button>
-              {/* <Button
-                type="submit"
-                colorPalette="red"
-                size="lg"
-                fontWeight="semibold"
-                loading={formik.isSubmitting}
-                loadingText="Updating..."
-                disabled={formik.isSubmitting}
-              >
-                Update password
-              </Button> */}
             </Flex>
           </Stack>
         </form>
@@ -274,35 +263,40 @@ export default function ChangePasswordForm() {
       {/* Confirmation Dialog */}
       <Dialog.Root
         open={openDialog}
-        placement="center"
         onOpenChange={({ open }) => setOpenDialog(open)}
       >
         <Portal>
-          <Dialog.Content>
-            <Dialog.Header>Confirm password change</Dialog.Header>
-            <Dialog.Body>
-              Are you sure you want to update your password? You’ll need the new
-              password next time you sign in.
-            </Dialog.Body>
-            <Dialog.Footer>
-              <Button
-                variant="ghost"
-                onClick={() => setOpenDialog(false)}
-                disabled={isBusyUpdating}
-              >
-                Cancel
-              </Button>
-              <Button
-                colorPalette="red"
-                onClick={handleDialogSave}
-                loading={isBusyUpdating}
-                loadingText="Saving..."
-              >
-                Save
-              </Button>
-            </Dialog.Footer>
-            <Dialog.CloseTrigger />
-          </Dialog.Content>
+          {/* dark overlay that covers the page */}
+          <Dialog.Backdrop />
+
+          {/* centers and layers the dialog above everything */}
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>Confirm password change</Dialog.Header>
+              <Dialog.Body>
+                Are you sure you want to update your password? You’ll need the
+                new one next time you sign in.
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button
+                  variant="ghost"
+                  onClick={() => setOpenDialog(false)}
+                  disabled={isBusyUpdating}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  colorPalette="red"
+                  onClick={handleDialogSave}
+                  loading={isBusyUpdating}
+                  loadingText="Saving..."
+                >
+                  Save
+                </Button>
+              </Dialog.Footer>
+              <Dialog.CloseTrigger />
+            </Dialog.Content>
+          </Dialog.Positioner>
         </Portal>
       </Dialog.Root>
     </Box>
