@@ -7,6 +7,8 @@ import {
   Heading,
   Stack,
   Text,
+  Dialog,
+  Portal,
 } from "@chakra-ui/react";
 
 import {
@@ -17,6 +19,16 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toaster } from "../ui/toaster";
+
+import { UPDATE_USER_PASSWORD } from "@/lib/graphql";
+import { useMutation } from "@apollo/client";
+import { signOut } from "next-auth/react";
+
+type FormValues = {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
 
 // Define reusable input styles for password fields
 const inputStyles = {
@@ -30,7 +42,7 @@ const inputStyles = {
   },
 };
 
-// function for score password strength
+// function for Strength Scoring (0..4)
 function scorePassword(password: string) {
   let score = 0;
   if (password.length >= 8) score += 1;
@@ -42,7 +54,7 @@ function scorePassword(password: string) {
 }
 
 // Initial form values
-const initialValues = {
+const initialValues: FormValues = {
   currentPassword: "",
   newPassword: "",
   confirmNewPassword: "",
@@ -66,22 +78,38 @@ const validationSchema = Yup.object({
 });
 
 export default function ChangePasswordForm() {
-  // formik hook
-  const formik = useFormik({
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [updatePassword, { loading: saving }] =
+    useMutation(UPDATE_USER_PASSWORD);
+
+  // Formik Hook
+  const formik = useFormik<FormValues>({
     initialValues,
     validationSchema,
-    onSubmit: async (_, helpers) => {
+    onSubmit: async (values, helpers) => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        toaster.create({
-          title: "Password updated",
-          description:
-            "You can use the new password the next time you sign in.",
-          type: "success",
-          duration: 5000,
+        const { currentPassword, newPassword } = values;
+
+        // Updating the password by mutation
+        await updatePassword({
+          variables: { input: { currentPassword, newPassword } },
         });
 
+        // Optionally check a returned flag (e.g., data.updateUserPassword.ok)
+        toaster.create({
+          title: "Password updated",
+          description: "You can use the new password next time you sign in.",
+          type: "success",
+          duration: 3000,
+        });
+
+        // Give the toast time to show (optional)
+        setTimeout(() => {
+          signOut({ callbackUrl: "/auth/signin" });
+        }, 1500);
+
         helpers.resetForm();
+        setOpenDialog(false);
       } catch (error) {
         console.error("Failed to update password:", error);
 
@@ -89,7 +117,7 @@ export default function ChangePasswordForm() {
           title: "Failed to update password",
           description: "An unexpected error occurred. Please try again.",
           type: "error",
-          duration: 4000,
+          duration: 3000,
         });
       } finally {
         helpers.setSubmitting(false);
@@ -103,6 +131,24 @@ export default function ChangePasswordForm() {
     [formik.values.newPassword],
   );
 
+  const isBusyUpdating = formik.isSubmitting || saving;
+
+  // Click handler for the visible button: validate first, then open modal
+  const handleOpenDialog = () => {
+    formik.setTouched(
+      {
+        currentPassword: true,
+        newPassword: true,
+        confirmNewPassword: true,
+      },
+      true,
+    );
+    if (formik.isValid && !isBusyUpdating) setOpenDialog(true);
+  };
+
+  // Modal "Save" -> submit the form
+  const handleDialogSave = () => formik.submitForm();
+
   return (
     <Box
       as="section"
@@ -115,7 +161,7 @@ export default function ChangePasswordForm() {
       backdropFilter="blur(28px) saturate(140%)"
     >
       <Stack gap={8}>
-        {/* update password HEADING */}
+        {/* Heading Update password */}
         <Stack gap={1}>
           <Heading size="lg">Update Password</Heading>
           <Text color="whiteAlpha.700" fontSize="sm">
@@ -123,9 +169,10 @@ export default function ChangePasswordForm() {
           </Text>
         </Stack>
 
-        {/* update password FORM */}
+        {/* Update Password FORM */}
         <form onSubmit={formik.handleSubmit} noValidate>
           <Stack gap={6}>
+            {/* Current password field */}
             <Field.Root>
               <Field.Label color="whiteAlpha.800">Current password</Field.Label>
               <PasswordInput
@@ -143,9 +190,11 @@ export default function ChangePasswordForm() {
                 </Text>
               ) : null}
             </Field.Root>
+
+            {/* New Password  field  */}
             <Field.Root>
               <Field.Label color="whiteAlpha.800">New password</Field.Label>
-              <Stack gap={3}>
+              <Stack gap={3} w="full">
                 <PasswordInput
                   name="newPassword"
                   placeholder="Use at least 8 characters"
@@ -162,11 +211,51 @@ export default function ChangePasswordForm() {
                 </Text>
               ) : null}
             </Field.Root>
-            <Field.Root></Field.Root>
+
+            {/* Confirm new password field  */}
+            <Field.Root>
+              <Field.Label color="whiteAlpha.800">
+                Confirm new password
+              </Field.Label>
+              <PasswordInput
+                name="confirmNewPassword"
+                placeholder="Re-enter your new password"
+                value={formik.values.confirmNewPassword}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                {...inputStyles}
+              />
+              {formik.touched.confirmNewPassword &&
+              formik.errors.confirmNewPassword ? (
+                <Text color="red.300" fontSize="sm" mt={1}>
+                  {formik.errors.confirmNewPassword}
+                </Text>
+              ) : null}
+            </Field.Root>
 
             {/* Button to submit the form */}
-            <Flex justify="flex-end">
+            <Flex justify="flex-end" gap={3}>
               <Button
+                variant="outline"
+                size="lg"
+                onClick={() => formik.resetForm()}
+                disabled={isBusyUpdating}
+              >
+                Reset
+              </Button>
+
+              {/* Open the confirmation modal (not a submit) */}
+              <Button
+                type="button"
+                colorPalette="red"
+                size="lg"
+                fontWeight="semibold"
+                onClick={handleOpenDialog}
+                disabled={isBusyUpdating}
+              >
+                Update password
+              </Button>
+              {/* <Button
                 type="submit"
                 colorPalette="red"
                 size="lg"
@@ -176,11 +265,46 @@ export default function ChangePasswordForm() {
                 disabled={formik.isSubmitting}
               >
                 Update password
-              </Button>
+              </Button> */}
             </Flex>
           </Stack>
         </form>
       </Stack>
+
+      {/* Confirmation Dialog */}
+      <Dialog.Root
+        open={openDialog}
+        placement="center"
+        onOpenChange={({ open }) => setOpenDialog(open)}
+      >
+        <Portal>
+          <Dialog.Content>
+            <Dialog.Header>Confirm password change</Dialog.Header>
+            <Dialog.Body>
+              Are you sure you want to update your password? You’ll need the new
+              password next time you sign in.
+            </Dialog.Body>
+            <Dialog.Footer>
+              <Button
+                variant="ghost"
+                onClick={() => setOpenDialog(false)}
+                disabled={isBusyUpdating}
+              >
+                Cancel
+              </Button>
+              <Button
+                colorPalette="red"
+                onClick={handleDialogSave}
+                loading={isBusyUpdating}
+                loadingText="Saving..."
+              >
+                Save
+              </Button>
+            </Dialog.Footer>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
+        </Portal>
+      </Dialog.Root>
     </Box>
   );
 }
