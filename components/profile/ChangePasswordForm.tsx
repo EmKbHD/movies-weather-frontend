@@ -88,11 +88,13 @@ export default function ChangePasswordForm() {
     validationSchema,
     onSubmit: async (values, helpers) => {
       try {
-        const { currentPassword, newPassword } = values;
+        const { currentPassword, newPassword, confirmNewPassword } = values;
 
         // Updating the password by mutation
         await updatePassword({
-          variables: { input: { currentPassword, newPassword } },
+          variables: {
+            input: { currentPassword, newPassword, confirmNewPassword },
+          },
         });
 
         // Optionally check a returned flag (e.g., data.updateUserPassword.ok)
@@ -105,7 +107,7 @@ export default function ChangePasswordForm() {
 
         // Give the toast time to show (optional)
         setTimeout(() => {
-          signOut({ callbackUrl: "/auth/signin" });
+          signOut({ callbackUrl: "/auth/login" });
         }, 1500);
 
         helpers.resetForm();
@@ -134,7 +136,7 @@ export default function ChangePasswordForm() {
   const isBusyUpdating = formik.isSubmitting || saving;
 
   // Click handler for the visible button: validate first, then open modal
-  const handleOpenDialog = () => {
+  const handleOpenDialog = async () => {
     formik.setTouched(
       {
         currentPassword: true,
@@ -143,7 +145,15 @@ export default function ChangePasswordForm() {
       },
       true,
     );
-    if (formik.isValid && !isBusyUpdating) setOpenDialog(true);
+    /**
+     *  Using the old formik.isValid right after validateForm() could still be based
+     *  on the previous state, and the dialog might open
+     *  even though validation just added errors. That's why `Object.keys(errors).length===0`
+     */
+    const errors = await formik.validateForm();
+    if (Object.keys(errors).length === 0 && !isBusyUpdating) {
+      setOpenDialog(true);
+    }
   };
 
   // Modal "Save" -> submit the form
@@ -264,11 +274,11 @@ export default function ChangePasswordForm() {
       <Dialog.Root
         open={openDialog}
         onOpenChange={({ open }) => setOpenDialog(open)}
+        placement="center"
       >
         <Portal>
           {/* dark overlay that covers the page */}
           <Dialog.Backdrop />
-
           {/* centers and layers the dialog above everything */}
           <Dialog.Positioner>
             <Dialog.Content>
