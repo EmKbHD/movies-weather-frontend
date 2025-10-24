@@ -39,7 +39,7 @@ const FavoritesList = () => {
         <SimpleGrid
           columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5, "2xl": 6 }}
           gap={4}
-          mt={8}
+          mt={{ base: 2, md: 4 }}
           w="full"
           placeItems="center"
           alignItems="stretch"

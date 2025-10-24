@@ -8,6 +8,7 @@ import {
   Button,
   Flex,
   HStack,
+  Icon,
   IconButton,
   Link,
   Stack,
@@ -123,6 +124,8 @@ export default function Navbar() {
                     _active={{
                       bg: "rgba(229, 9, 20, 0.18)",
                     }}
+                    _focus={{ boxShadow: "none" }}
+                    _focusVisible={{ boxShadow: "none" }}
                     onClick={() => setActiveLink(item.href)}
                   >
                     {item.label}
@@ -162,7 +165,11 @@ export default function Navbar() {
                 bg: "rgba(229, 9, 20, 0.18)",
               }}
             >
-              {isOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+              {isOpen ? (
+                <Icon as={FiX} boxSize={4} />
+              ) : (
+                <Icon as={FiMenu} boxSize={7} />
+              )}
             </IconButton>
           </HStack>
         </Flex>
@@ -186,7 +193,7 @@ export default function Navbar() {
             role="dialog"
             aria-modal="true"
             position="fixed"
-            top="4.5rem"
+            top="3.8rem"
             left="0"
             right="0"
             zIndex="modal"

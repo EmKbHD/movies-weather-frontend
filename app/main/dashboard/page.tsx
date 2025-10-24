@@ -17,12 +17,12 @@ export default function DashboardPage() {
         {userCity ? (
           <WeatherCard city={userCity} />
         ) : (
-          <Text color="red.500">Failed to display weather...</Text>
+          <Text color="red.500">Failed to display the weather...</Text>
         )}
 
-        <VStack align="stretch" gap={2}>
-          <Text fontSize={["sm", "md", "lg", "2xl"]} fontWeight="bold">
-            Your Favorite Movies
+        <VStack align="stretch" gap={1}>
+          <Text fontSize={[".5rem", "md", "lg", "2xl"]} fontWeight="400">
+            Favorite Movies
           </Text>
           <FavoritesList />
         </VStack>

@@ -13,6 +13,7 @@ import { GET_CITY_WEATHER } from "@/lib/graphql";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { ImSpinner } from "react-icons/im";
 import { MdOutlineRefresh } from "react-icons/md";
+import { MdLocationOn } from "react-icons/md";
 
 interface WeatherCardProps {
   city: string;
@@ -111,11 +112,12 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
   return (
     <Box
       width={{ base: "100%", md: "80%", lg: "70%" }}
-      p={6}
+      height={{ base: "10.5rem", md: "auto" }}
+      p={{ base: 4, md: 6 }}
       bg={glassBackground}
       borderRadius="xl"
       boxShadow="lg"
-      mb={6}
+      mb={{ base: "1", md: "6" }}
       backdropFilter="blur(10px)"
       border="1px solid"
       borderColor={glassBorder}
@@ -132,35 +134,54 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
         pointerEvents: "none",
       }}
     >
-      <VStack gap={1} align="center" position="relative">
-        <Text
-          fontSize={{ base: "md", md: "lg", lg: "2xl" }}
-          fontWeight="bold"
-          color={textColor}
-          textShadow="0 2px 4px rgba(0,0,0,0.1)"
-        >
-          {weather.cityName}
-        </Text>
+      <VStack display="flex" align="center" position="relative">
+        <VStack flexDir="row">
+          <Icon as={MdLocationOn} boxSize="1.2rem" />
+          <Text
+            fontSize={{ base: "md", md: "lg", lg: "2xl" }}
+            fontWeight="400"
+            color={textColor}
+            letterSpacing={1}
+            textShadow="0 2px 4px rgba(0,0,0,0.1)"
+          >
+            {weather.cityName}
+          </Text>
+        </VStack>
 
-        <Image
-          src={icon ?? weather.icon}
-          alt="Weather icon"
-          boxSize="100px"
-          filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))"
-          animation="bounce"
-        />
+        <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
+          <Image
+            src={icon ?? weather.icon}
+            alt="Weather icon"
+            boxSize={{ base: "4rem", md: "6rem" }}
+            filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))"
+            animation="bounce"
+          />
+          <Box display="flex" alignItems="flex-start" lineHeight={1}>
+            <Text
+              fontSize={{ base: "2rem", md: "4rem" }}
+              fontWeight="400"
+              color={textColor}
+              textShadow="0 2px 4px rgba(0,0,0,0.1)"
+              letterSpacing="-1px"
+            >
+              {Math.round(temperature ?? weather.temperature)}
+            </Text>
+            {/* small degree + C, positioned up */}
+            <Text
+              as="span"
+              fontSize="18px"
+              fontWeight="300"
+              lineHeight="1"
+              ml={1}
+              transform="translateY(+1px)"
+            >
+              °C
+            </Text>
+          </Box>
+        </Box>
 
-        <Text
-          fontSize="3xl"
-          fontWeight="semi bold"
-          color={textColor}
-          textShadow="0 2px 4px rgba(0,0,0,0.1)"
-        >
-          {Math.round(temperature ?? weather.temperature)}°C
-        </Text>
-
-        <HStack gap={2} align="center">
-          <Text fontSize="sm" color={subtleText}>
+        <HStack align="center">
+          <Text fontSize="sm" color={subtleText} letterSpacing={1}>
             Last updated:{" "}
             {timestamp
               ? new Date(timestamp).toLocaleTimeString([], {
