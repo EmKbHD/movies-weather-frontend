@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/react";
-import SigninForm from "./LoginForm";
+import LoginForm from "./LoginForm";
 
 const LoginPage = () => {
   return (
@@ -40,7 +40,7 @@ const LoginPage = () => {
           </Text>
         </Box>
         <Box width="full" maxW="md">
-          <SigninForm />
+          <LoginForm />
         </Box>
       </Stack>
     </Flex>
