@@ -13,10 +13,10 @@ const httpLink = new HttpLink({
   credentials: "include", // Important for cookies or delete if not using cookies
 });
 
-// 2. Add the authLink to inject the token
+// 3. Create Apollo Client with authLink + httpLink (Create a cache (where results are stored))
+
 const cache = new InMemoryCache();
 
-// 3. Create Apollo Client with authLink + httpLink (Create a cache (where results are stored))
 export const apolloClient = new ApolloClient({
   link: httpLink,
   cache,
