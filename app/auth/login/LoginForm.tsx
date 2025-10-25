@@ -11,6 +11,7 @@ import {
   Heading,
   Stack,
 } from "@chakra-ui/react";
+import { useSession } from "next-auth/react";
 import { toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -21,6 +22,7 @@ import { signIn } from "next-auth/react";
 
 const LoginForm = () => {
   const router = useRouter();
+  const { update } = useSession();
 
   // form initial value
   const initialValues = {
@@ -78,11 +80,17 @@ const LoginForm = () => {
         if (res.ok && !res.error) {
           console.log("Test in formik onSubmit - Login successful", res);
 
+          // Update the session
+          await update();
+
           toaster.create({
             title: "Welcome back!",
             type: "success",
             duration: 2500,
           });
+
+          // Wait briefly to ensure session is updated
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           //res.url will be the callbackUrl we provided above
           router.replace(res.url || "/main/dashboard");
