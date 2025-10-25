@@ -11,7 +11,7 @@ const LoginPage = () => {
       justify="center"
       px={{ base: 6, md: 12 }}
       py={{ base: 10, md: 20 }}
-      bgImage="linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.9)), url('https://')"
+      bgGradient="linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.9))"
       bgPos="center"
       bgSize="cover"
       bgRepeat="no-repeat"

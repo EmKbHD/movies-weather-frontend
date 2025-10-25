@@ -4,6 +4,7 @@ import {
   Input,
   Grid,
   Button,
+  Fieldset,
   Field,
   Box,
   Text,
@@ -15,25 +16,11 @@ import Link from "next/link";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 const LoginForm = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // If Auth.js ever redirects with ?error=..., show it in a toast
-  React.useEffect(() => {
-    const err = searchParams.get("error");
-    if (err) {
-      toaster.create({
-        title: "Login failed",
-        description: decodeURIComponent(err),
-        type: "error",
-        duration: 5000,
-      });
-    }
-  }, [searchParams]);
 
   // form initial value
   const initialValues = {
@@ -78,7 +65,7 @@ const LoginForm = () => {
         }
 
         if (res.error) {
-          // This string comes from our 'authorize' → CredentialsSignin(message)
+          // This string comes from our 'authorize'  CredentialsSignin(message)
           toaster.create({
             title: "Login failed",
             description: res.error || "Invalid email or password.",
@@ -89,7 +76,7 @@ const LoginForm = () => {
         }
 
         if (res.ok && !res.error) {
-          console.log("✅Login successful", res);
+          console.log("?Login successful", res);
 
           toaster.create({
             title: "Welcome back!",
@@ -131,53 +118,59 @@ const LoginForm = () => {
         </Heading>
         <form onSubmit={formik.handleSubmit} noValidate>
           <Stack gap={5}>
-            <Field.Root>
-              <Field.Label color="whiteAlpha.800">Email address</Field.Label>
-              <Input
-                name="email"
-                type="email"
-                placeholder="name@example.com"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                bg="rgba(40, 40, 40, 0.9)"
-                borderColor="transparent"
-                color="white"
-                _placeholder={{ color: "whiteAlpha.600" }}
-                _focusVisible={{
-                  borderColor: "red.500",
-                  boxShadow: "0 0 0 1px rgba(229, 9, 20, 0.8)",
-                }}
-              />
-              {formik.touched.email && formik.errors.email && (
-                <Text color="red.400" fontSize="sm" mt={1}>
-                  {formik.errors.email}
-                </Text>
-              )}
-            </Field.Root>
-            <Field.Root>
-              <Field.Label color="whiteAlpha.800">Password</Field.Label>
-              <PasswordInput
-                name="password"
-                placeholder="Your password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                bg="rgba(40, 40, 40, 0.9)"
-                borderColor="transparent"
-                color="white"
-                _placeholder={{ color: "whiteAlpha.600" }}
-                _focusVisible={{
-                  borderColor: "red.500",
-                  boxShadow: "0 0 0 1px rgba(229, 9, 20, 0.8)",
-                }}
-              />
-              {formik.touched.password && formik.errors.password && (
-                <Text color="red.400" fontSize="sm" mt={1}>
-                  {formik.errors.password}
-                </Text>
-              )}
-            </Field.Root>
+            <Fieldset.Root>
+              <Fieldset.Content>
+                <Field.Root>
+                  <Field.Label color="whiteAlpha.800">
+                    Email address
+                  </Field.Label>
+                  <Input
+                    name="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    bg="rgba(40, 40, 40, 0.9)"
+                    borderColor="transparent"
+                    color="white"
+                    _placeholder={{ color: "whiteAlpha.600" }}
+                    _focusVisible={{
+                      borderColor: "red.500",
+                      boxShadow: "0 0 0 1px rgba(229, 9, 20, 0.8)",
+                    }}
+                  />
+                  {formik.touched.email && formik.errors.email && (
+                    <Text color="red.400" fontSize="sm" mt={1}>
+                      {formik.errors.email}
+                    </Text>
+                  )}
+                </Field.Root>
+                <Field.Root>
+                  <Field.Label color="whiteAlpha.800">Password</Field.Label>
+                  <PasswordInput
+                    name="password"
+                    placeholder="Your password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    bg="rgba(40, 40, 40, 0.9)"
+                    borderColor="transparent"
+                    color="white"
+                    _placeholder={{ color: "whiteAlpha.600" }}
+                    _focusVisible={{
+                      borderColor: "red.500",
+                      boxShadow: "0 0 0 1px rgba(229, 9, 20, 0.8)",
+                    }}
+                  />
+                  {formik.touched.password && formik.errors.password && (
+                    <Text color="red.400" fontSize="sm" mt={1}>
+                      {formik.errors.password}
+                    </Text>
+                  )}
+                </Field.Root>
+              </Fieldset.Content>
+            </Fieldset.Root>
             <Grid>
               <Button
                 type="submit"
