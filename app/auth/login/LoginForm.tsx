@@ -76,7 +76,7 @@ const LoginForm = () => {
         }
 
         if (res.ok && !res.error) {
-          console.log("?Login successful", res);
+          console.log("Test in formik onSubmit - Login successful", res);
 
           toaster.create({
             title: "Welcome back!",

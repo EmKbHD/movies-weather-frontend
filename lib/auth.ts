@@ -45,6 +45,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             }),
           });
 
+          console.log("GraphQL response status:", response.status);
+
           // Network / server status error
           if (!response.ok) {
             throw new CredentialsSignin(
