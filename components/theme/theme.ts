@@ -53,7 +53,6 @@ const config = defineConfig({
     breakpoints: {
       base: "0",
       sm: "23.438rem", // 375px
-      smmd: "37.5rem", // 600px
       md: "48rem", // 768px
       lg: "62rem", // 992px
       xl: "80rem", // 1280px

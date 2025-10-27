@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "lint:fix": "eslint --fix",
-    "typegen": "chakra-ui typegen ./components/theme/theme.ts"
+    "lint:fix": "eslint --fix"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",

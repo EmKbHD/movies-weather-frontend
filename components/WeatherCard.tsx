@@ -111,7 +111,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
 
   return (
     <Box
-      width={{ base: "98%", smmd: "85%", md: "80%", lg: "70%" }}
+      width={{ base: "98%", md: "80%", lg: "70%" }}
       height={{ base: "10.5rem", md: "auto" }}
       p={{ base: 4, md: 6 }}
       bg={glassBackground}
@@ -132,6 +132,11 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
         borderRadius: "xl",
         background: glassGradient,
         pointerEvents: "none",
+      }}
+      css={{
+        "@media (min-width: 37.5rem) and (max-width: 47.999rem)": {
+          width: "85%",
+        },
       }}
     >
       <VStack display="flex" align="center" position="relative">

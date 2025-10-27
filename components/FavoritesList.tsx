@@ -38,12 +38,17 @@ const FavoritesList = () => {
       ) : (
         <SimpleGrid
           columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5, "2xl": 6 }}
-          gap={{ base: 3, sm: 4, smmd: "2.5rem", md: 4 }}
+          gap={{ base: 3, sm: 4, md: 4 }}
           mt={{ base: 2, md: 4 }}
           w="full"
           placeItems="center"
           alignItems="stretch"
           p={{ base: 2, md: 4 }}
+          css={{
+            "@media (min-width: 37.5rem) and (max-width: 47.999rem)": {
+              gap: "2.5rem",
+            },
+          }}
         >
           {data.getFavoriteMovies.map(({ movie }: { movie: Movie }) => (
             <MovieCard key={movie.externalId} movie={movie} isFavorite={true} />
