@@ -67,7 +67,7 @@ const LoginForm = () => {
         }
 
         if (res.error) {
-          // This string comes from our 'authorize'  CredentialsSignin(message)
+          // This string comes from our 'authorize' CredentialsSignin(message)
           toaster.create({
             title: "Login failed",
             description: res.error || "Invalid email or password.",
@@ -80,7 +80,7 @@ const LoginForm = () => {
         if (res.ok && !res.error) {
           console.log("Test in formik onSubmit - Login successful", res);
 
-          // Update the session
+          // Update the session after successful login
           await update();
 
           toaster.create({
@@ -89,7 +89,7 @@ const LoginForm = () => {
             duration: 2500,
           });
 
-          // Wait briefly to ensure session is updated
+          // Wait briefly to ensure session is properly updated
           await new Promise((resolve) => setTimeout(resolve, 500));
 
           //res.url will be the callbackUrl we provided above

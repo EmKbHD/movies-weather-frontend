@@ -33,12 +33,12 @@ const FavoritesList = () => {
         </Center>
       ) : data?.getFavoriteMovies?.length === 0 ? (
         <Center py={10}>
-          <Text color="gray.500">No movies in Database for the moment.</Text>
+          <Text color="gray.500">No movies 🎬 in Database for the moment.</Text>
         </Center>
       ) : (
         <SimpleGrid
           columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5, "2xl": 6 }}
-          gap={4}
+          gap={{ base: 3, sm: 4, smmd: "2.5rem", md: 4 }}
           mt={{ base: 2, md: 4 }}
           w="full"
           placeItems="center"

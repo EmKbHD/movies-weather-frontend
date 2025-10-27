@@ -1,8 +1,7 @@
-import { createSystem, defaultConfig } from "@chakra-ui/react";
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
 
-export const system = createSystem(defaultConfig, {
+const config = defineConfig({
   theme: {
-    // 1) Add keyframes
     keyframes: {
       spin: {
         from: { transform: "rotate(0deg)" },
@@ -43,16 +42,18 @@ export const system = createSystem(defaultConfig, {
       shadows: {
         glow: { value: "0 0 2px rgba(229, 9, 20, 0.6)" },
       },
-      // Add an animation token that references the keyframe
       animations: {
-        // name it "spin" so you can use animation="spin"
         spin: { value: "spin 1s linear infinite" },
         bounce: { value: "bounce 1.5s ease-in-out infinite" },
+      },
+      spacing: {
+        6: { value: "1.5rem" }, // Ensure spacing-6 exists
       },
     },
     breakpoints: {
       base: "0",
       sm: "23.438rem", // 375px
+      smmd: "37.5rem", // 600px
       md: "48rem", // 768px
       lg: "62rem", // 992px
       xl: "80rem", // 1280px
@@ -70,3 +71,5 @@ export const system = createSystem(defaultConfig, {
     },
   },
 });
+
+export const system = createSystem(defaultConfig, config);

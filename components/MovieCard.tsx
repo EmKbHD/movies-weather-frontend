@@ -68,7 +68,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, isFavorite = false }) => {
 
   return (
     <Box
-      maxW="280px"
+      maxW="300px"
       w="full"
       h="full"
       borderRadius="xl"

@@ -65,76 +65,18 @@ export default function Navbar() {
       borderRadius={{ base: "xl", md: "none" }}
       mx="auto"
     >
-      <Flex w="full" justify="center">
+      <Flex maxW="1440px" justify="center" mx="auto">
         <Flex
-          w={{ base: "90%", md: "75%" }}
-          maxW="1440px"
+          w="90%"
           h="4.5rem"
-          align="center"
           justify="space-between"
+          align="center"
+          mx="auto"
           color="white"
-          px={{ base: 4, md: 6, lg: 8 }}
+          px={{ base: ".5rem", md: "2rem", lg: "" }}
         >
-          {/* logo area */}
-          <Link
-            as={NextLink}
-            href="/main/dashboard"
-            _hover={{ textDecor: "none", color: "brand-red" }}
-            onClick={() => setActiveLink(NavbarMenuItems[0].href)}
-          >
-            <Text
-              fontSize={{ base: "25px", md: "30px", lg: "40px" }}
-              color="brand-red-dark"
-              as="span"
-              textTransform="uppercase"
-              fontFamily="'Bebas Neue','Anton',Impact,'Arial Black',sans-serif"
-              fontWeight="900"
-              lineHeight="0.9"
-              letterSpacing="-0.04em"
-            >
-              MovieWeather
-            </Text>
-          </Link>
-          {/* menu links  */}
-          <HStack
-            w="full"
-            h="4rem"
-            gap={{ base: 2, md: 8 }}
-            align="center"
-            justify="center"
-          >
-            <HStack
-              as="nav"
-              gap={8}
-              display={{ base: "none", md: "flex" }}
-              color="whiteAlpha.800"
-              position="absolute"
-            >
-              {NavbarMenuItems.map((item) => {
-                const isActive = activeLink === item.href;
-                return (
-                  <Link
-                    as={NextLink}
-                    key={item.href}
-                    href={item.href}
-                    fontWeight={isActive ? "semibold" : ""}
-                    color={isActive ? "white" : "whiteAlpha.700"}
-                    fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                    _hover={{ textDecor: "none", color: "red.300" }}
-                    _active={{
-                      bg: "rgba(229, 9, 20, 0.18)",
-                    }}
-                    _focus={{ boxShadow: "none" }}
-                    _focusVisible={{ boxShadow: "none" }}
-                    onClick={() => setActiveLink(item.href)}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </HStack>
-          </HStack>
-          <HStack gap={3} justify="flex-end">
+          {/* signin / profile area */}
+          <Box order={{ md: 3 }}>
             {user ? (
               <ProfileMenu user={user} />
             ) : (
@@ -144,7 +86,47 @@ export default function Navbar() {
                 </Button>
               </Link>
             )}
-            {/* hamburger and close buttons */}
+          </Box>
+
+          {/* logo area */}
+          <Box order={{ md: 1 }}>
+            <Link
+              as={NextLink}
+              href="/main/dashboard"
+              _hover={{ textDecor: "none", color: "brand-red" }}
+              onClick={() => setActiveLink(NavbarMenuItems[0].href)}
+            >
+              <Text
+                fontSize={{ base: "25px", md: "30px", lg: "40px" }}
+                color="brand-red-dark"
+                as="span"
+                textTransform="uppercase"
+                fontFamily="'Bebas Neue','Anton',Impact,'Arial Black',sans-serif"
+                fontWeight="900"
+                lineHeight="0.9"
+                letterSpacing="-0.04em"
+                display={{ base: "none", md: "inline-flex" }}
+              >
+                MovieWeather
+              </Text>
+              <Text
+                fontSize="4xl"
+                color="brand-red-dark"
+                as="span"
+                textTransform="uppercase"
+                fontFamily="'Bebas Neue','Anton',Impact,'Arial Black',sans-serif"
+                fontWeight="900"
+                lineHeight="0.9"
+                letterSpacing="-0.04em"
+                display={{ base: "inline-flex", md: "none" }}
+              >
+                MW
+              </Text>
+            </Link>
+          </Box>
+
+          {/* hamburger menu and close buttons */}
+          <Box display={{ base: "block", md: "none" }}>
             <IconButton
               aria-label={isOpen ? "Close menu" : "Open menu"}
               aria-expanded={isOpen}
@@ -171,6 +153,42 @@ export default function Navbar() {
                 <Icon as={FiMenu} boxSize={7} />
               )}
             </IconButton>
+          </Box>
+
+          {/* menu links  */}
+          <HStack
+            order={{ md: 2 }}
+            as="nav"
+            h="4rem"
+            gap={{ base: 2, md: 8, lg: 16 }}
+            display={{ base: "none", md: "flex" }}
+            color="whiteAlpha.800"
+            position="relative"
+            align="center"
+            justify="center"
+          >
+            {NavbarMenuItems.map((item) => {
+              const isActive = activeLink === item.href;
+              return (
+                <Link
+                  as={NextLink}
+                  key={item.href}
+                  href={item.href}
+                  fontWeight={isActive ? "semibold" : ""}
+                  color={isActive ? "white" : "whiteAlpha.700"}
+                  fontSize={{ base: "sm", md: "md", lg: "lg" }}
+                  _hover={{ textDecor: "none", color: "red.300" }}
+                  _active={{
+                    bg: "rgba(229, 9, 20, 0.18)",
+                  }}
+                  _focus={{ boxShadow: "none" }}
+                  _focusVisible={{ boxShadow: "none" }}
+                  onClick={() => setActiveLink(item.href)}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </HStack>
         </Flex>
       </Flex>

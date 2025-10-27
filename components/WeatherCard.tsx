@@ -111,7 +111,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
 
   return (
     <Box
-      width={{ base: "100%", md: "80%", lg: "70%" }}
+      width={{ base: "98%", smmd: "85%", md: "80%", lg: "70%" }}
       height={{ base: "10.5rem", md: "auto" }}
       p={{ base: 4, md: 6 }}
       bg={glassBackground}
