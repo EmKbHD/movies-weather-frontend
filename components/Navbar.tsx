@@ -181,8 +181,8 @@ export default function Navbar() {
                   _active={{
                     bg: "rgba(229, 9, 20, 0.18)",
                   }}
-                  _focus={{ boxShadow: "none" }}
-                  _focusVisible={{ boxShadow: "none" }}
+                  _focus={{ boxShadow: "none", bg: "none" }}
+                  _focusVisible={{ boxShadow: "none", bg: "none" }}
                   onClick={() => setActiveLink(item.href)}
                 >
                   {item.label}

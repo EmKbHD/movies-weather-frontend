@@ -45,7 +45,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             }),
           });
 
-          console.log("GraphQL response status:", response.status);
+          console.log("GraphQL response status - auth.ts:", response.status);
 
           // Network / server status error
           if (!response.ok) {
@@ -56,7 +56,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
           const results = await response.json();
 
-          console.log("GraphQL json:", JSON.stringify(results, null, 2));
+          console.log(
+            "GraphQL json - auth.ts:",
+            JSON.stringify(results, null, 2),
+          );
 
           const login = results?.data?.login;
 

@@ -174,11 +174,11 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
             {/* small degree + C, positioned up */}
             <Text
               as="span"
-              fontSize="18px"
+              fontSize="1.8rem"
               fontWeight="300"
               lineHeight="1"
               ml={1}
-              transform="translateY(+1px)"
+              transform="translateY(6px)"
             >
               °C
             </Text>

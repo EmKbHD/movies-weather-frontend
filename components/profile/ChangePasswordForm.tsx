@@ -244,12 +244,17 @@ export default function ChangePasswordForm() {
             </Field.Root>
 
             {/* Button to submit the form */}
-            <Flex justify="flex-end" gap={3}>
+            <Flex
+              justify="flex-end"
+              gap={3}
+              direction={{ base: "column", sm: "row" }} // stack on mobile, row on larger
+            >
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => formik.resetForm()}
                 disabled={isBusyUpdating}
+                flex={{ mdDown: "1" }} // full width on mobile
               >
                 Reset
               </Button>
@@ -262,6 +267,7 @@ export default function ChangePasswordForm() {
                 fontWeight="semibold"
                 onClick={handleOpenDialog}
                 disabled={isBusyUpdating}
+                flex={{ mdDown: "1" }}
               >
                 Update password
               </Button>

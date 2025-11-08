@@ -52,7 +52,7 @@ export default function EditProfileForm() {
 
   const user: User | undefined = userData?.me ?? undefined;
 
-  console.log("👤 User data:", user);
+  console.log("👤 User data - Edit Profile:", user);
 
   // initial form values
   const initialValues = {

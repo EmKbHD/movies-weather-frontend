@@ -89,9 +89,6 @@ const LoginForm = () => {
             duration: 2500,
           });
 
-          // Wait briefly to ensure session is properly updated
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
           //res.url will be the callbackUrl we provided above
           router.replace(res.url || "/main/dashboard");
           return;
