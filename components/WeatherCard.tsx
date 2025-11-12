@@ -140,7 +140,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
       }}
     >
       <VStack display="flex" align="center" position="relative">
-        <VStack flexDir="row">
+        <HStack flexDir="row">
           <Icon as={MdLocationOn} boxSize="1.2rem" />
           <Text
             fontSize={{ base: "md", md: "lg", lg: "2xl" }}
@@ -151,9 +151,9 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
           >
             {weather.cityName}
           </Text>
-        </VStack>
+        </HStack>
 
-        <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
+        <Box display="flex" alignItems="center" gap={2}>
           <Image
             src={icon ?? weather.icon}
             alt="Weather icon"
@@ -174,11 +174,11 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
             {/* small degree + C, positioned up */}
             <Text
               as="span"
-              fontSize="1.8rem"
+              fontSize={{ base: "1.3rem", md: "1.8rem" }}
               fontWeight="300"
               lineHeight="1"
               ml={1}
-              transform="translateY(6px)"
+              transform={{ mdDown: "translateY(1px)", md: "translateY(5px)" }}
             >
               °C
             </Text>
@@ -187,7 +187,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
 
         <HStack align="center">
           <Text fontSize="sm" color={subtleText} letterSpacing={1}>
-            Last updated:{" "}
+            Last update:{" "}
             {timestamp
               ? new Date(timestamp).toLocaleTimeString([], {
                   hour: "2-digit",
