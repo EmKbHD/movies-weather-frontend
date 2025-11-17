@@ -10,10 +10,11 @@ import {
   HStack,
   Icon,
   IconButton,
-  Link,
+  SkeletonCircle,
   Stack,
   Text,
 } from "@chakra-ui/react";
+import Link from "next/link";
 import { FiMenu, FiX } from "react-icons/fi";
 
 import ProfileMenu from "./profile/ProfileMenu";
@@ -37,7 +38,7 @@ export default function Navbar() {
     NavbarMenuItems[0].href,
   );
 
-  const { data: userData } = useQuery(GET_USER, {
+  const { data: userData, loading } = useQuery(GET_USER, {
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
@@ -77,10 +78,12 @@ export default function Navbar() {
         >
           {/* signin / profile area */}
           <Box order={{ md: 3 }}>
-            {user ? (
+            {loading ? (
+              <SkeletonCircle size={10} />
+            ) : user ? (
               <ProfileMenu user={user} />
             ) : (
-              <Link as={NextLink} href="/auth/login">
+              <Link href="/auth/login">
                 <Button colorPalette="red" size="sm">
                   Sign in
                 </Button>
@@ -91,9 +94,7 @@ export default function Navbar() {
           {/* logo area */}
           <Box order={{ md: 1 }}>
             <Link
-              as={NextLink}
               href="/main/dashboard"
-              _hover={{ textDecor: "none", color: "brand-red" }}
               onClick={() => setActiveLink(NavbarMenuItems[0].href)}
             >
               <Text
@@ -171,18 +172,9 @@ export default function Navbar() {
               const isActive = activeLink === item.href;
               return (
                 <Link
-                  as={NextLink}
                   key={item.href}
                   href={item.href}
-                  fontWeight={isActive ? "semibold" : ""}
                   color={isActive ? "white" : "whiteAlpha.700"}
-                  fontSize={{ base: "sm", md: "md", lg: "lg" }}
-                  _hover={{ textDecor: "none", color: "red.300" }}
-                  _active={{
-                    bg: "rgba(229, 9, 20, 0.18)",
-                  }}
-                  _focus={{ boxShadow: "none", bg: "none" }}
-                  _focusVisible={{ boxShadow: "none", bg: "none" }}
                   onClick={() => setActiveLink(item.href)}
                 >
                   {item.label}
@@ -233,10 +225,8 @@ export default function Navbar() {
                 <Stack as="nav" gap={4} fontSize="lg" fontWeight="medium">
                   {NavbarMenuItems.map((item) => (
                     <Link
-                      as={NextLink}
                       key={item.href}
                       href={item.href}
-                      _hover={{ textDecor: "none", color: "red.300" }}
                       onClick={closeMobileMenu}
                     >
                       {item.label}
@@ -275,7 +265,7 @@ export default function Navbar() {
                     </Button>
                   </Stack>
                 ) : (
-                  <Link as={NextLink} href="/auth/login">
+                  <Link href="/auth/login">
                     <Button
                       as={NextLink}
                       colorPalette="red"

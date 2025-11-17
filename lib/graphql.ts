@@ -20,8 +20,8 @@ export const GET_USER = gql`
 // GET USER CITY WEATHER
 
 export const GET_CITY_WEATHER = gql`
-  query GetCurrentWeather($city: String!) {
-    getCurrentWeather(city: $city) {
+  query GetCurrentWeather {
+    getCurrentWeather {
       cityName
       temperature
       icon

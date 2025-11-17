@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Icon,
+  Skeleton,
   Text,
   HStack,
   IconButton,
@@ -15,14 +16,8 @@ import { ImSpinner } from "react-icons/im";
 import { MdOutlineRefresh } from "react-icons/md";
 import { MdLocationOn } from "react-icons/md";
 
-interface WeatherCardProps {
-  city: string;
-}
-
-const WeatherCard = ({ city }: WeatherCardProps) => {
-  const { data, loading, error } = useQuery(GET_CITY_WEATHER, {
-    variables: { city },
-  });
+const WeatherCard = () => {
+  const { data, loading, error } = useQuery(GET_CITY_WEATHER);
 
   //refresh the same query
   const client = useApolloClient();
@@ -31,6 +26,8 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
   const [icon, setIcon] = useState<string | null>(null);
   const [timestamp, setTimestamp] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // loading skeleton
 
   // colors / glass styles
   const textColor = useColorModeValue("gray.800", "white");
@@ -57,19 +54,14 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
       setIcon(weather.icon);
       setTimestamp(weather.timestamp);
     }
-  }, [data]);
+  }, [client, data]);
 
   // refresh handler: fetch from network-only
   const refreshLastUpdate = useCallback(async () => {
     try {
       setRefreshing(true);
-      const res = await client.query({
-        query: GET_CITY_WEATHER,
-        variables: { city },
-        fetchPolicy: "network-only",
-      });
 
-      const refresh = res?.data?.getCurrentWeather;
+      const refresh = data?.getCurrentWeather;
       if (refresh) {
         setTemperature(refresh.temperature);
         setIcon(refresh.icon);
@@ -80,12 +72,29 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
     } finally {
       setRefreshing(false);
     }
-  }, [client, city]);
+  }, [data]);
 
   if (loading)
     return (
-      <Box p={6} borderRadius="xl" boxShadow="lg" width="100%" mb={6}>
-        <Text textAlign="center">Loading weather information...</Text>
+      <Box
+        width={{ base: "98%", md: "80%", lg: "70%" }}
+        height={{ base: "10.5rem", md: "auto" }}
+        p={{ base: 4, md: 6 }}
+        borderRadius="xl"
+        boxShadow="lg"
+        mb={{ base: "1", md: "6" }}
+        border="1px solid"
+        position="relative"
+        css={{
+          "@media (min-width: 37.5rem) and (max-width: 47.999rem)": {
+            width: "85%",
+          },
+        }}
+      >
+        <Skeleton h="24px" w="160px" mb={3} />
+        <Skeleton h="24px" w="160px" mb={3} />
+        <Skeleton h="80px" w="70%" mb={3} />
+        <Skeleton h="18px" w="60%" />
       </Box>
     );
 
@@ -104,7 +113,7 @@ const WeatherCard = ({ city }: WeatherCardProps) => {
     return (
       <Box p={6} borderRadius="xl" boxShadow="lg" width="100%" mb={6}>
         <Text color="orange.500" textAlign="center">
-          No weather data available for {city}
+          Unable to load current weather!
         </Text>
       </Box>
     );

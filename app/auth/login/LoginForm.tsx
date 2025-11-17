@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import { useState } from "react";
 import {
   Input,
   Grid,
@@ -23,6 +23,8 @@ import { signIn } from "next-auth/react";
 const LoginForm = () => {
   const router = useRouter();
   const { update } = useSession();
+
+  const [loading, setLoading] = useState(false);
 
   // form initial value
   const initialValues = {
@@ -86,8 +88,9 @@ const LoginForm = () => {
           toaster.create({
             title: "Welcome back!",
             type: "success",
-            duration: 2500,
+            duration: 5000,
           });
+          setLoading(true);
 
           //res.url will be the callbackUrl we provided above
           router.replace(res.url || "/main/dashboard");
@@ -183,9 +186,9 @@ const LoginForm = () => {
                 fontWeight="bold"
                 size="lg"
                 w="full"
-                loading={formik.isSubmitting}
+                loading={loading || formik.isSubmitting}
                 loadingText="Signing in..."
-                disabled={formik.isSubmitting}
+                disabled={loading || formik.isSubmitting}
               >
                 Sign In
               </Button>
